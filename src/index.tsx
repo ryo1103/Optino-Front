@@ -7,6 +7,7 @@ import theme from './theme'
 import { CustomFonts } from './customFonts';
 import { MantineProvider } from '@mantine/core';
 import { BrowserRouter } from "react-router-dom";
+import { NotificationsProvider } from '@mantine/notifications';
 
 
 import { Web3ReactProvider } from '@web3-react/core'
@@ -30,8 +31,10 @@ root.render(
       <CustomFonts />
         <BrowserRouter>
         <Web3ReactProvider getLibrary={getLibrary}>
+        <NotificationsProvider position="top-right">
          
             <App />
+          </NotificationsProvider>
         </Web3ReactProvider>
           
         </BrowserRouter>

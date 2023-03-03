@@ -2,7 +2,7 @@ import { MantineThemeOverride, MantineProvider } from '@mantine/core';
 const theme: MantineThemeOverride= {
 
     
-    fontFamily: '',
+    fontFamily: 'TestSöhne-Buch, TestSöhne-Fett',
     
     fontSizes:{sm:'12px',md:'14px', lg:'16px', xl:'18px'},
     
@@ -16,7 +16,7 @@ const theme: MantineThemeOverride= {
     },
 
     headings:{
-        fontFamily:'Graphik',
+        fontFamily:'TestSöhne-Fett,TestSöhne-Buch',
         sizes:{
             h1:{fontSize: '61px', fontWeight:700,},
             h2:{fontSize: '49px', fontWeight:700,},

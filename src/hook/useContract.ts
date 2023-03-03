@@ -2,14 +2,14 @@
 import { Contract } from '@ethersproject/contracts';
 import { useMemo } from 'react';
 
-// import { getContract } from '../utils';
+import { getContract } from '../utils';
 import { useActiveWeb3React } from './index';
-// import USDT_ABI from '../connectors/abis/Usdt.json';
-// import Otoken_ABI from '../connectors/abis/Otoken.json';
+ import USDT_ABI from '../config/USDC.json';
+ import option from '../config/option.json';
 import { stringify } from 'querystring';
 
 // returns null on errors
-/* export function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
+export function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
   const { library, account } = useActiveWeb3React()
 
   return useMemo(() => {
@@ -23,8 +23,9 @@ import { stringify } from 'querystring';
   }, [address, ABI, library, withSignerIfPossible, account])
 }
 
+
 export function useOptionContract(tokenAddress?: string, withSignerIfPossible?: boolean): Contract | null {
-  return useContract(tokenAddress, Otoken_ABI, withSignerIfPossible)
+  return useContract(tokenAddress, option, withSignerIfPossible)
 }
 
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Contract | null {

@@ -48,7 +48,7 @@ function App() {
     
      <BackgroundImage
         src={back}
-        style={{height:'100vh'}}
+        style={{height:'100vh' }}
 
       >
       <Routes>

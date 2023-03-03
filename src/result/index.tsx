@@ -52,25 +52,20 @@ function Result (){
             <Group position='right'>
                 <div style={{width:'28%'}}>
                 
-                    <Flex direction={'column'}>
+                    <Flex direction={'column'} mt={20}>
                         
                         <Text c='#fff' fz={20}>Current Price</Text>
                         <Title c='#fff' order={4}>1650.00</Title>
+                        <Text c='#fff' fz={20}>04:15pm</Text>
+                    </Flex>
+                    <Flex direction={'column'} mt={40}>
+                        <Text c='#07005C' fz={20}>Strike Price</Text>
+                        <Title c='#07005C' order={4}>1650.00</Title>
+                        <Text c='#07005C' fz={20}>04:15pm</Text>
+                    </Flex>
 
-                        <Text c='#fff' fz={20}>04:15pm</Text>
-                    </Flex>
-                    <Flex direction={'column'}>
-                        <Text c='#fff' fz={20}>Current Price</Text>
-                        <Title c='#fff' order={4}>1650.00</Title>
-                        <Text c='#fff' fz={20}>04:15pm</Text>
-                    </Flex>
 
-                    <Flex direction={'column'}>
-                        <Text c='#fff' fz={20}>Current Price</Text>
-                        <Title c='#fff' order={4}>1650.00</Title>
-                        <Text c='#fff' fz={20}>04:15pm</Text>
-                    </Flex>
-                    <Button classNames={{root: classes.root,inner:classes.inner}} size='xl' radius="md"  onClick={()=>navigate("/trade")}>Play Again</Button>
+                    <Button mt={90} classNames={{root: classes.root,inner:classes.inner}} size='xl' radius="md"  onClick={()=>navigate("/trade")}>Play Again</Button>
 
                 </div>
                 

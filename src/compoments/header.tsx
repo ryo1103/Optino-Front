@@ -59,15 +59,22 @@ export  function Header({children }) {
       >
         <div className={classes.header}>
             
-            <Image
+          {/*    <Image
             radius="md"
             src={logo}
-            width={164}
+            width={182}
             height={64}
             alt="Logo"
-            mr={60}
-            />
-            <Burger opened={opened} onClick={toggle} aria-label={label}/>
+
+       /> 
+       */}
+          <img src={logo} alt=""  width={166} height={64}/>
+
+
+            
+         <Burger opened={opened} onClick={toggle} aria-label={label}/>
+
+            
 
         </div>
         
@@ -112,14 +119,7 @@ export  function Header({children }) {
        <>
         <div className={classes.header} style={{backgroundColor:(pathname.includes('result') || pathname==='/about' || pathname==='/stake') ?'#fff':'transparent' }}>
             
-            <Image
-            radius="md"
-            src={logo}
-            width={164}
-            height={64}
-            alt="Logo"
-            mr={60}
-            />
+            <img src={logo} alt=""  width={166} height={64}/>
             <Burger opened={opened} onClick={toggle} aria-label={label}/>
 
         </div>

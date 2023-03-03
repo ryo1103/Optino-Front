@@ -33,7 +33,11 @@ const useStyles = createStyles((theme) => ({
 
             <Group align={'start'} position="apart" ml={120} mr={120} mt={160} >
                 <Title  order={3} c='#07005C' fw={400}>Stake</Title>
-                <Title  order={3} c='#07005C' fw={400}>{stake} USDC</Title>
+                <Title  order={3} c='#07005C' fw={400}>{stake} </Title>
+            </Group>
+            <Group align={'start'} position="apart" ml={120} mr={120} mt={10} >
+                <Title  order={3} c='#07005C' fw={400}>LP Token Price</Title>
+                <Title  order={3} c='#07005C' fw={400}>$ 1.2</Title>
             </Group>
             <Group align={'start'} position="apart" ml={120} mr={120} mt={10} >
                 <Title  order={3} c='#07005C' fw={400}>ARP</Title>
