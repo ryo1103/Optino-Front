@@ -83,7 +83,7 @@ const useStyles = createStyles((theme) => ({
     const [canWithdraw, setCanWithdraw] = useState(0)
     const [depositAmount, setDepositAmount] = useState(10)
     const [withdrawAmount, setWithdrawAmount] = useState(10)
-    const [inputAmount, setInputAmount] = useState(13)
+    const [inputAmount, setInputAmount] = useState(0)
     const [select, setSelect] = useState("Stake")
     const tokenContract = useTokenContract(usdt);
     const Optimistic = useOptionContract(option);
