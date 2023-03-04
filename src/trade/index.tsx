@@ -3,13 +3,13 @@ import {
 } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
-import { useNavigate,useLocation} from 'react-router-dom';
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
 import { useWeb3React } from "@web3-react/core";
 import { useCountDown, useRequest } from "ahooks";
 import { ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
+import { useNavigate } from 'react-router-dom';
 import time from "../assets/images/time.png";
 import Header from "../compoments/header";
 import { option, usdt } from "../config";
@@ -17,7 +17,7 @@ import optionAbi from "../config/optino.json";
 import usdtAbi from "../config/USDC.json";
 import { injected } from "../connectors";
 import { useOptionContract, useTokenContract } from "../hook/useContract";
-import { simplifyStr } from "../utils";
+import { checkExpires, simplifyStr } from "../utils";
 
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -191,6 +191,7 @@ function Trade() {
   const [strikePrice, setStrikePrice] = useState(0)
   const [inputAmount, setInputAmount] = useState(0)
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
 
     const endT = dayjs.unix(expiry);
@@ -249,18 +250,18 @@ function Trade() {
   }, [indexPrice]);
 
   const [countdown, formattedRes] = useCountDown({
-    targetDate: diff,
+    targetDate: dayjs.unix(expiry),
     // onEnd:()=>{ console.log(1111);navigate("/result/success")}
   });
   const { hours, minutes, seconds } = formattedRes;
 
-  const Hours = hours < 10 ? "0" + hours : hours.toString();
-  const Minutes = minutes < 10 ? "0" + minutes : minutes.toString();
-  const Seconds = seconds < 10 ? "0" + seconds : seconds.toString();
+  const Hours = !hours ? '00' : hours < 10 ? "0" + hours : hours.toString();
+  const Minutes = !minutes ? '00' : minutes < 10 ? "0" + minutes : minutes.toString();
+  const Seconds = !seconds ? '00' : seconds < 10 ? "0" + seconds : seconds.toString();
 
   // contract
 
-  const multiCallOptionInfo = useCallback(async (account: any) => {
+  const multiCallOptionInfo = useCallback(async (account: any, timeset:number = 0) => {
     const { ethereum } = window as any;
 
     const provider = new ethers.providers.Web3Provider(ethereum);
@@ -284,6 +285,26 @@ function Trade() {
             reference: "calls",
             methodName: "calls",
             methodParameters: [2],
+          },
+          {
+            reference: "calls",
+            methodName: "calls",
+            methodParameters: [1],
+          },
+          {
+            reference: "calls",
+            methodName: "calls",
+            methodParameters: [2],
+          },
+          {
+            reference: "puts",
+            methodName: "puts",
+            methodParameters: [2],
+          },
+          {
+            reference: "puts",
+            methodName: "puts",
+            methodParameters: [1],
           },
           {
             reference: "puts",
@@ -311,13 +332,24 @@ function Trade() {
       },
     ];
 
+    setLoading(true);
     const multiCallResult = await multicall.call(contractCallContext);
-    
+
     let add = multiCallResult.results.optino.callsReturnContext[0].returnValues[0]
-    let callList = multiCallResult.results.optino.callsReturnContext[1].returnValues
-    let putList = multiCallResult.results.optino.callsReturnContext[2].returnValues
     let usdcAllowence = multiCallResult.results.usdc.callsReturnContext[0].returnValues[0]
     let usdcBalance = multiCallResult.results.usdc.callsReturnContext[1].returnValues[0]
+
+    const allLevelsCallList = multiCallResult.results.optino.callsReturnContext.slice(1, 1+3)?.map(i=>i?.returnValues)
+    const allLevelsPutList = multiCallResult.results.optino.callsReturnContext.slice(4, 4+3)?.map(i=>i?.returnValues)
+
+    let callList = checkExpires(allLevelsCallList) || []
+    let putList = checkExpires(allLevelsPutList) || []
+
+    console.log(callList, putList)
+
+    // let callList = multiCallResult.results.optino.callsReturnContext[1].returnValues
+    // let putList = multiCallResult.results.optino.callsReturnContext[2].returnValues
+
 
     setOptionAdd(ethers.BigNumber.from(add).toString())
     // console.log( callList,'call')
@@ -341,6 +373,7 @@ function Trade() {
 
     setUSDCAllowance(Number(formatUnits( ethers.BigNumber.from(usdcAllowence).toString(),18)))
     setBalance(Number(formatUnits( ethers.BigNumber.from(usdcBalance).toString(),18)))
+    setLoading(false);
    
   }, []);
 
@@ -386,8 +419,8 @@ function Trade() {
     []
   );
 
-  const { run: multiCallOptionInfoRun } = useRequest(
-    (account) => multiCallOptionInfo(account),
+  const { run: multiCallOptionInfoRun, cancel: multiCallOptionInfoCancel } = useRequest(
+    (account, timeset) => multiCallOptionInfo(account, timeset),
     {
       pollingInterval: 50000,
       manual: true,
@@ -396,7 +429,7 @@ function Trade() {
 
   useEffect(() => {
     if (account) {
-      multiCallOptionInfoRun(account);
+      multiCallOptionInfoRun(account, 0);
     } else {
       setBalance(0);
 
@@ -438,6 +471,12 @@ function Trade() {
   );
 
   const traderBuy = async () => {
+    if(!account) {
+      connectWallet()
+      return;
+    }
+
+    setLoading(true);
     try {
       if (!USDCAllowance) {
         const res = await approve();
@@ -446,8 +485,9 @@ function Trade() {
         console.log("approve res ", _res);
         // setApproveLoading(false)
       }
-
-      const res = await Optimistic?.buyOption(expiry,strikePrice, inputAmount, select==='CALL');
+      const params = [expiry, strikePrice, inputAmount, select==='CALL']
+      console.table(params)
+      const res = await Optimistic?.buyOption(...params);
       const _res = await res.wait();
       let { status, transactionHash } = _res;
       console.log("_res", _res);
@@ -463,6 +503,7 @@ function Trade() {
         });
         // setAmount('')
       }
+      setLoading(false);
     } catch (e) {
       console.log("err", e);
       // @ts-ignore
@@ -474,6 +515,7 @@ function Trade() {
         autoClose: 3600,
         color: "red",
       });
+      setLoading(false);
     }
   };
 
@@ -663,9 +705,10 @@ function Trade() {
             size="md"
             radius="md"
             onClick={traderBuy}
+            loading={loading}
             disabled={!inputAmount || !Number(inputAmount)}
           >
-            { account === 'undefined' ? 'Connect' :'Confirm'}
+            { !account ? 'Connect' : !USDCAllowance ? 'Approve' : 'Confirm'}
           </Button>
         </Grid.Col>
 
