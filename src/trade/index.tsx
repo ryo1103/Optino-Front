@@ -1,35 +1,33 @@
 import {
-    BackgroundImage, Button, createStyles, Flex, Grid, Group, Space, Text
+  BackgroundImage, Button, createStyles, Flex, Grid, Group, Space, Text
 } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
-import { formatEther } from "@ethersproject/units";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
 import { useWeb3React } from "@web3-react/core";
 import { useCountDown, useRequest } from "ahooks";
+import { ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 import time from "../assets/images/time.png";
 import Header from "../compoments/header";
 import { option, usdt } from "../config";
-import optionAbi from "../config/optino.json"
-import usdtAbi from "../config/USDC.json"
+import optionAbi from "../config/optino.json";
+import usdtAbi from "../config/USDC.json";
 import { injected } from "../connectors";
 import {
-    useOptionContract, useTokenContract
+  useOptionContract, useTokenContract
 } from "../hook/useContract";
 import { simplifyStr } from "../utils";
-import { BigNumber, ethers } from "ethers";
 
 
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Multicall, ContractCallResults,ContractCallContext } from 'ethereum-multicall';
+import { ContractCallContext, Multicall } from 'ethereum-multicall';
 import line from "../assets/images/line.png";
 import Trend from "../compoments/trend";
-import useHistoryData from "../hook/useHistoryData";
-import { format } from "path";
+import useKLine from "../hook/useKline";
 
 const maxAllowance =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
@@ -477,7 +475,8 @@ function Trade() {
 
 
 
-  const data = useHistoryData()
+  // const data = useHistoryData()
+  const data = useKLine()
 
   return (
     <Header>

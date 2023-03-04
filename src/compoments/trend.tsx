@@ -57,6 +57,8 @@ interface InitParamProps {
   diff: string;
 }
 
+let dataPoints: string | any[] = [];
+
 const Trend: React.FC<TrendProps> = (props: TrendProps) => {
   const {
     type = "up",
@@ -70,7 +72,7 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
 
   const [initParam, setInitParam] = React.useState<InitParamProps>();
   const [source, setSource] = React.useState<MarketData>([]);
-  const [dataPoints, setDataPoints] = React.useState<any>([]);
+  // const [dataPoints, setDataPoints] = React.useState<any>([]);
   const canvasSize = useSize(canvasRef.current);
   const [imgPosition, setImgPosition] = React.useState({
     top: "0px",
@@ -114,7 +116,8 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
       return;
     const { canvasX, offsetX, canvasY, offsetY, max, diff } = initParam;
 
-    setDataPoints([]);
+    // setDataPoints([]);
+    dataPoints = [];
 
     // 2500 / 500px = 5 -> 100 / ? = 5
     const realCanvasFactorX = BigNumber(canvasX)
@@ -164,36 +167,33 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
       line.lineTo(x, y);
 
       const pointX = BigNumber(x)
-      .div(realCanvasFactorX)
-      .toNumber()
+        .div(realCanvasFactorX)
+        .toNumber();
       const pointY = BigNumber(y)
-      .div(realCanvasFactorY)
-      .toNumber()
+        .div(realCanvasFactorY)
+        .toNumber();
 
-      if(index === cur.length - 1 ){
-        setImgPosition({
-          left: (pointX - 50) + 'px',
-          top: (pointY - 80) + 'px'
-        })
-      }
-      
+      // if(index === cur.length - 1 ){
+      //   setImgPosition({
+      //     left: (pointX - 50) + 'px',
+      //     top: (pointY - 80) + 'px'
+      //   })
+      // }
+      const _ = JSON.parse(JSON.stringify(dataPoints));
 
-      setDataPoints((old: any) => {
-        const _ = JSON.parse(JSON.stringify(old));
-        return [
-          ..._,
-          {
-            canvasX: x,
-            canvasy: y,
-            c,
-            t,
-            x: pointX,
-            y: pointY,
-            realCanvasFactorX,
-            realCanvasFactorY,
-          },
-        ];
-      });
+      dataPoints = [
+        ..._,
+        {
+          canvasX: x,
+          canvasy: y,
+          c,
+          t,
+          x: pointX,
+          y: pointY,
+          realCanvasFactorX,
+          realCanvasFactorY,
+        },
+      ];
     });
 
     // ctx.strokeStyle = type === "up" ? "#00ba6c" : "#e55d75";
@@ -204,60 +204,29 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
     ctx.stroke(line);
   }, [canvasSize, factor, initParam, source]);
 
-  // const drawTooltip = async (x?: number | undefined, y?: number | undefined) => {
-  //   if (!canvasRef || !canvasRef.current || !initParam) return;
-
-  //   const ctx = canvasRef.current.getContext("2d")!;
-  //   const lastSource = source.slice(-1)[0];
-  //   const index = source?.length - 1;
-  //   const backImg = await loadImage(require("../assets/images/bullV2.png"));
-  //   const { canvasX, offsetX, canvasY, offsetY, max, diff } = initParam;
-
-  //   ctx.clearRect(0, 0, canvasX, canvasY);
-
-  //   const wholeOffsetX = BigNumber(canvasX)
-  //     .minus(BigNumber(canvasX).multipliedBy(factor))
-  //     .div(2)
-  //     .toNumber();
-  //   const wholeOffsetY = BigNumber(canvasY)
-  //     .minus(BigNumber(canvasY).multipliedBy(factor))
-  //     .div(2)
-  //     .toNumber();
-
-  //   const _x = new BigNumber(index)
-  //     .dividedBy(index)
-  //     .multipliedBy(offsetX)
-  //     .plus(TREND_LINE_DIAM)
-  //     .multipliedBy(factor || 0)
-  //     .plus(wholeOffsetX)
-  //     .toNumber();
-
-  //   const _y = new BigNumber(max)
-  //     .minus(lastSource?.c)
-  //     .dividedBy(diff)
-  //     .multipliedBy(offsetY)
-  //     .plus(TREND_LINE_DIAM)
-  //     .multipliedBy(factor || 0)
-  //     .plus(wholeOffsetY)
-  //     .toNumber();
-
-  //   const moveX = x || (_x - 250);
-  //   const moveY = y || (_y - 250);
-
-  //   ctx.drawImage(backImg, moveX, moveY, 500, 550);
-  // };
-
   React.useEffect(() => {
     if (!canvasSize?.width) return;
     drawTrend();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initParam, source, type, canvasSize?.width]);
 
-  React.useEffect(() => {
-    if (canvasSize?.width && dataPoints?.length) {
-      mouseMove();
+  const handleMove = (e: any) => {
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    for (const point of dataPoints) {
+      if (
+        BigNumber(mouseX)
+          .minus(point.x)
+          .abs()
+          .lte(5)
+      ) {
+        setImgPosition({
+          left: mouseX - 50 + "px",
+          top: 1 * (point.y - 80) + "px",
+        });
+      }
     }
-  }, [canvasSize?.width, dataPoints?.length]);
+  };
 
   const mouseMove = () => {
     if (
@@ -269,24 +238,16 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
     )
       return;
 
-    wrapperRef.current.addEventListener("mousemove", (e: any) => {
-      const rect = canvasRef.current!.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      for (const point of dataPoints) {
-        if (
-          BigNumber(mouseX)
-            .minus(point.x)
-            .abs()
-            .lte(5)
-        ) {
-          setImgPosition({
-            left: mouseX - 50 + "px",
-            top: 1 * (point.y - 80) + "px",
-          });
-        }
-      }
-    });
+    wrapperRef.current.addEventListener("mousemove", handleMove);
   };
+
+  React.useEffect(() => {
+    if (canvasSize?.width && dataPoints?.length) {
+      mouseMove();
+
+      return wrapperRef.current.removeEventListener("mousemove", mouseMove);
+    }
+  }, [canvasSize?.width, dataPoints?.length]);
 
   return (
     <Wrapper size={size} ref={wrapperRef}>
