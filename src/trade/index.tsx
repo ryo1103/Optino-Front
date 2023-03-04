@@ -249,17 +249,15 @@ function Trade() {
     }
   }, [indexPrice]);
 
-  console.log('expiry', expiry)
-
   const [countdown, formattedRes] = useCountDown({
-    targetDate: dayjs.unix(1677984931),
+    targetDate: dayjs.unix(expiry),
     // onEnd:()=>{ console.log(1111);navigate("/result/success")}
   });
   const { hours, minutes, seconds } = formattedRes;
 
-  const Hours = hours < 10 ? "0" + hours : hours.toString();
-  const Minutes = minutes < 10 ? "0" + minutes : minutes.toString();
-  const Seconds = seconds < 10 ? "0" + seconds : seconds.toString();
+  const Hours = !hours ? '00' : hours < 10 ? "0" + hours : hours.toString();
+  const Minutes = !minutes ? '00' : minutes < 10 ? "0" + minutes : minutes.toString();
+  const Seconds = !seconds ? '00' : seconds < 10 ? "0" + seconds : seconds.toString();
 
   // contract
 
