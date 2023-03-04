@@ -84,6 +84,7 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
   const [imgPosition, setImgPosition] = React.useState({
     top: "0px",
     left: "0px",
+    opacity: 0,
   });
 
   const filterTrend = React.useCallback(() => {
@@ -180,12 +181,13 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
         .div(realCanvasFactorY)
         .toNumber();
 
-      // if(index === cur.length - 1 ){
-      //   setImgPosition({
-      //     left: (pointX - 50) + 'px',
-      //     top: (pointY - 80) + 'px'
-      //   })
-      // }
+      if(index === cur.length - 1 && imgPosition.left === '0px'){
+        setImgPosition({
+          left: (pointX - 50) + 'px',
+          top: (pointY - 80) + 'px',
+          opacity: 1
+        })
+      }
       const _ = JSON.parse(JSON.stringify(dataPoints));
 
       dataPoints = [
@@ -230,6 +232,7 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
         setImgPosition({
           left: mouseX - 50 + "px",
           top: 1 * (point.y - 80) + "px",
+          opacity: 1
         });
       }
     }

@@ -1,6 +1,5 @@
 import {
-    BackgroundImage, Button, createStyles, Flex, Grid, Group, Space, Text,
-    NumberInput
+  BackgroundImage, Button, createStyles, Flex, Grid, Group, NumberInput, Space, Text
 } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
@@ -24,10 +23,10 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ContractCallContext, Multicall } from "ethereum-multicall";
-import line from "../assets/images/line.png";
 import eth from "../assets/images/eth.png";
-import Trend from "../compoments/trend";
-import useKLine from "../hook/useKline";
+import line from "../assets/images/line.png";
+// import Trend from "../compoments/trend";
+import Trend from "../compoments/trendV2";
 
 const maxAllowance =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
@@ -490,9 +489,6 @@ function Trade() {
     }
   }, [info, select]);
 
-  // const data = useHistoryData()
-  const data = useKLine();
-
   return (
     <Header>
       <Group position="right" className={classes.countDownContainer}>
@@ -517,19 +513,18 @@ function Trade() {
       </Group>
 
       <Group position="left" style={{ display: "flex", flexWrap: "nowrap" }}>
-        {/* <Group style={{ padding: "20px", width: "50%", height: "280px" }} position="right">
-        <Trend data={data}/>
-        </Group> */}
         <Group
           style={{
             padding: "20px",
             minWidth: "867px",
-            width: "100%",
-            height: "60vh",
+            width: "74%",
+            height: "50vh",
+            justifyContent: 'flex-start'
           }}
           position="right"
         >
-          <Trend data={data} factor={0.8} />
+          {/* <Trend data={data} factor={0.8} /> */}
+          <Trend />
         </Group>
       </Group>
 
