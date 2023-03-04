@@ -282,12 +282,12 @@ function Trade() {
           {
             reference: "calls",
             methodName: "calls",
-            methodParameters: [0],
+            methodParameters: [2],
           },
           {
             reference: "puts",
             methodName: "puts",
-            methodParameters: [0],
+            methodParameters: [2],
           },
         ],
       },
@@ -337,7 +337,7 @@ function Trade() {
     console.log(multiCallResult,'res')
 
     console.log(formatUnits( ethers.BigNumber.from(usdcAllowence).toString(),18))
-    console.log(formatUnits( ethers.BigNumber.from(usdcBalance ).toString(),18))
+    console.log(formatUnits( ethers.BigNumber.from(usdcBalance).toString(),18))
 
     setUSDCAllowance(Number(formatUnits( ethers.BigNumber.from(usdcAllowence).toString(),18)))
     setBalance(Number(formatUnits( ethers.BigNumber.from(usdcBalance).toString(),18)))
@@ -418,7 +418,7 @@ function Trade() {
       // @ts-igonre
       multiOptionPriceRun(expiry, strikePrice, select);
     } else {
-      setBalance(0);
+      // setBalance(0);
 
       //init();
     }

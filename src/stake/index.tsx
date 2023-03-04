@@ -1,4 +1,4 @@
-import { Button, Text, Container, Group, Image, SegmentedControl, Grid, Divider, Space, createStyles, Select, Stack, Flex, Paper, Input, TextInput, Slider, Drawer, Title, Modal, Tooltip,Box, List,Mark} from '@mantine/core';
+import { Button, Text, Container, Group, Image, NumberInput,SegmentedControl, Grid, Divider, Space, createStyles, Select, Stack, Flex, Paper, Input, TextInput, Slider, Drawer, Title, Modal, Tooltip,Box, List,Mark} from '@mantine/core';
 import { hover } from '@testing-library/user-event/dist/hover';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useWeb3React } from "@web3-react/core";
@@ -32,6 +32,10 @@ const useStyles = createStyles((theme) => ({
         fontWeight:400,
 
     },
+    close:{
+        background:'transparent',
+        color:'#07005C'
+      },
     inner:{
         marginRight:'25px'
     },
@@ -42,10 +46,28 @@ const useStyles = createStyles((theme) => ({
 
     },
     modal:{
-        border: "1px solid rgba(7, 0, 92, 0.16)",
-        backgroundColor: "rgba(21, 250, 38, 0.07)",
+        border: "1px solid rgba(7, 0, 92, 0.7)",
+        backgroundColor: "rgba(255,255,255,0.7)",
         borderRadius:'12px',
-    }
+    },
+    wrapper: {
+        borderBottom:'1px solid #07005C',
+        fontSize:'20px'
+      },
+      rightSection:{
+        right:'20px'
+      },
+      input: {
+    
+        fontSize:'20px'
+      },
+      confirm: {
+    border: "1px solid rgba(12, 219, 4, 1)",
+    color: "rgba(7, 0, 92, 1)",
+    background: "rgba(21, 250, 38, 0.3)",
+    "&:not([data-disabled])": theme.fn.hover({
+      backgroundColor: "rgba(21, 250, 38, 0.7)",
+    })},
 }))
 
  function Stake  (){
@@ -61,6 +83,8 @@ const useStyles = createStyles((theme) => ({
     const [canWithdraw, setCanWithdraw] = useState(0)
     const [depositAmount, setDepositAmount] = useState(10)
     const [withdrawAmount, setWithdrawAmount] = useState(10)
+    const [inputAmount, setInputAmount] = useState(13)
+    const [select, setSelect] = useState("Stake")
     const tokenContract = useTokenContract(usdt);
     const Optimistic = useOptionContract(option);
     const [opened, { open, close }] = useDisclosure(false);
@@ -236,7 +260,7 @@ const useStyles = createStyles((theme) => ({
             console.log("approve res ", _res);
             // setApproveLoading(false)
           }
-          const res = await Optimistic?.liquidityDeposit(depositAmount);
+          const res = await Optimistic?.liquidityDeposit(inputAmount);
           const _res = await res.wait();
           let { status, transactionHash } = _res;
           console.log("_res", _res);
@@ -275,7 +299,7 @@ const useStyles = createStyles((theme) => ({
             console.log("approve res ", _res);
             // setApproveLoading(false)
           }
-          const res = await Optimistic?.requestLiquidityWithdraw(withdrawAmount);
+          const res = await Optimistic?.requestLiquidityWithdraw(inputAmount);
           const _res = await res.wait();
           let { status, transactionHash } = _res;
           console.log("_res", _res);
@@ -319,12 +343,12 @@ const useStyles = createStyles((theme) => ({
             </Group>
             <Group align={'start'} position="apart" ml={120} mr={120} mt={10} >
                 <Title  order={3} c='#07005C' fw={400}>LP Token Price</Title>
-                <Title  order={3} c='#07005C' fw={400}>$ {lpPrice}</Title>
+                <Title  order={3} c='#07005C' fw={400}>$ {Math.floor(lpPrice* 10000)/10000}</Title>
             </Group>
             
             <Group align={'start'} position="apart" ml={120} mr={120} mt={10} >
                 <Title  order={3} c='#07005C' fw={400}>Spare funds</Title>
-                <Title  order={3} c='#07005C' fw={400}>$ {canWithdraw}</Title>
+                <Title  order={3} c='#07005C' fw={400}>$ {Math.floor(canWithdraw *10000)/10000}</Title>
             </Group>
            {/* <Group align={'start'} position="apart" ml={120} mr={120} mt={10} >
                 <Title  order={3} c='#07005C' fw={400}>ARP</Title>
@@ -333,8 +357,8 @@ const useStyles = createStyles((theme) => ({
 
 
             <Group align={'start'} position="left" ml={120} mr={120}   mt={100}>
-                <Button radius="md" classNames={{root:classes.root, inner:classes.inner}} size='xl' onClick={open}>Stake</Button>
-                <Button radius="md" classNames={{root:classes.root, inner:classes.inner}} size='xl' ml={60} onClick={withdrawRequest}>Unstake</Button>
+                <Button radius="md" classNames={{root:classes.root, inner:classes.inner}} size='xl' onClick={()=>{setSelect('Stake');open()}}>Stake</Button>
+                <Button radius="md" classNames={{root:classes.root, inner:classes.inner}} size='xl' ml={60} onClick={()=>{setSelect('Unstake');open()}}>Unstake</Button>
 
             {account !== undefined ? (
               // @ts-ignore
@@ -352,13 +376,41 @@ const useStyles = createStyles((theme) => ({
 
             <Modal
                 opened={opened} 
-                onClose={close} 
-                title="Stake" 
+                onClose={()=>{close(); setInputAmount(0)}} 
+                title={select}
                 centered
-                classNames={{title:classes.title}}
+                classNames={{title:classes.title, content: classes.modal, header:classes.modal,close:classes.close}}
                 >
+                <Group position='apart' >
+                <NumberInput
+                    pb={60}
+                    mt={40}
+                   
+                    variant="unstyled"
+                    placeholder="0"
+                    classNames={{wrapper : classes.wrapper, rightSection : classes.rightSection,input:classes.input}}
+                    value={inputAmount}
+                    onChange={(val:any) =>setInputAmount(val)}
+                    rightSection={"USDC"}
+                    w='66%'
 
-                {/* Modal content */}
+                    />
+
+            <Button
+                classNames={{ root:  classes.confirm }}
+                size="md"
+                radius="md"
+                onClick={select==='Stake'? deposit: withdrawRequest}
+                disabled={!inputAmount|| !Number(inputAmount)}
+            >
+                { account === 'undefined' ? 'Connect' :'Confirm'}
+            </Button>
+
+            
+            </Group>
+                
+
+            
             </Modal>
                     
         </Header>
