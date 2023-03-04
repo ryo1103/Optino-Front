@@ -62,7 +62,7 @@ const Trend = ({ strikePrices }: { strikePrices: StrikePrices }) => {
       calls.forEach((i: any) => {
         const callPriceLine = {
           price: Number(i),
-          color: "#3abe12",
+          color: "#3abe124b",
           lineWidth: lineWidth,
           lineStyle: LineStyle.Solid,
           axisLabelVisible: true,
@@ -76,7 +76,7 @@ const Trend = ({ strikePrices }: { strikePrices: StrikePrices }) => {
       puts.forEach((i: any) => {
         const putPriceLine = {
           price: Number(i),
-          color: "#2012be",
+          color: "#2012be57",
           lineWidth: lineWidth,
           lineStyle: LineStyle.Solid,
           axisLabelVisible: true,
