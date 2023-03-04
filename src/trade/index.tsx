@@ -411,10 +411,10 @@ function Trade (){
                 <Flex direction={'column'} w='120px'>
                 
                     
-                        <Text c='#fff' fz={20}>Current Price</Text>
-                        <Title c='#fff' order={4}>{index}</Title>
+                        <Text c='#1300F2' fz={20}>Current Price</Text>
+                        <Title c='#1300F2' order={4}>{index}</Title>
 
-                        <Text c='#fff' fz={20}>04:15pm</Text>
+                        <Text c='#1300F2' fz={20}>04:15pm</Text>
                         
                     </Flex>
                     <BackgroundImage
