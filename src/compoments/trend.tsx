@@ -80,7 +80,7 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
   const filterTrend = React.useCallback(() => {
     const { width, height } = size;
     const from = data?.length - TREND_LIST_TOTAL;
-    const newData = data.slice(from, TREND_LIST_TOTAL);
+    const newData = data.slice(from, -1);
 
     const ratio = window.devicePixelRatio || 1;
     const x = width * ratio * 2;
