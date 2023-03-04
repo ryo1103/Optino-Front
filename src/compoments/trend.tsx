@@ -4,7 +4,6 @@ import BigNumber from "bignumber.js";
 import { maxBy, minBy } from "lodash-es";
 import * as React from "react";
 import styled from "styled-components";
-import { loadImage } from "../utils";
 
 const TREND_LINE_DIAM = 10 * (window.devicePixelRatio || 1);
 const TREND_LIST_TOTAL = 31;
@@ -12,13 +11,21 @@ const TREND_LIST_TOTAL = 31;
 
 const Wrapper = styled.div<{ size: { width: number; height: number } }>`
   flex: none !important;
+  position: relative;
   /* width: ${({ size }) => size.width}px; */
   /* height: ${({ size }) => size.height}px; */
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: flex-start;
   canvas {
     width: 100%;
     height: 100%;
+  }
+  .tooltip{
+    position: absolute;
+    width: 140px;
+    height: 136px;
   }
 `;
 
@@ -58,11 +65,16 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
   } = props;
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const wrapperRef = React.useRef<any>(null);
 
   const [initParam, setInitParam] = React.useState<InitParamProps>();
   const [source, setSource] = React.useState<MarketData>([]);
   const [dataPoints, setDataPoints] = React.useState<any>([]);
   const canvasSize = useSize(canvasRef.current);
+  const [imgPosition, setImgPosition] = React.useState({
+    top: "0px",
+    left: "0px",
+  });
 
   const filterTrend = React.useCallback(() => {
     const { width, height } = size;
@@ -97,11 +109,13 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
   }, [data]);
 
   const drawTrend = React.useCallback(() => {
-    if (!canvasRef || !canvasRef.current || !initParam || !canvasSize?.width) return;
+    if (!canvasRef || !canvasRef.current || !initParam || !canvasSize?.width)
+      return;
     const { canvasX, offsetX, canvasY, offsetY, max, diff } = initParam;
 
     setDataPoints([]);
 
+    // 2500 / 500px = 5 -> 100 / ? = 5
     const realCanvasFactorX = BigNumber(canvasX)
       .div(canvasSize!.width)
       .toNumber();
@@ -148,9 +162,36 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
         .toNumber();
       line.lineTo(x, y);
 
+      const pointX = BigNumber(x)
+      .div(realCanvasFactorX)
+      .toNumber()
+      const pointY = BigNumber(y)
+      .div(realCanvasFactorY)
+      .toNumber()
+
+      if(index === cur.length - 1 ){
+        setImgPosition({
+          left: (pointX - 50) + 'px',
+          top: (pointY - 100) + 'px'
+        })
+      }
+      
+
       setDataPoints((old: any) => {
         const _ = JSON.parse(JSON.stringify(old));
-        return [..._, { canvasX: x, canvasy: y, c, t, x: BigNumber(x).multipliedBy(realCanvasFactorX).toNumber(), y: BigNumber(x).multipliedBy(realCanvasFactorY).toNumber() }];
+        return [
+          ..._,
+          {
+            canvasX: x,
+            canvasy: y,
+            c,
+            t,
+            x: pointX,
+            y: pointY,
+            realCanvasFactorX,
+            realCanvasFactorY,
+          },
+        ];
       });
     });
 
@@ -160,113 +201,111 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
     ctx.lineJoin = "round";
     ctx.lineWidth = TREND_LINE_DIAM;
     ctx.stroke(line);
-  }, [factor, initParam, source]);
+  }, [canvasSize, factor, initParam, source]);
 
-  const drawTooltip = async () => {
-    if (!canvasRef || !canvasRef.current || !initParam) return;
+  // const drawTooltip = async (x?: number | undefined, y?: number | undefined) => {
+  //   if (!canvasRef || !canvasRef.current || !initParam) return;
 
-    const ctx = canvasRef.current.getContext("2d")!;
-    const lastSource = source.slice(-1)[0];
-    const index = source?.length - 1;
-    const backImg = await loadImage(require("../assets/images/bullV2.png"));
-    const { canvasX, offsetX, canvasY, offsetY, max, diff } = initParam;
-    const wholeOffsetX = BigNumber(canvasX)
-      .minus(BigNumber(canvasX).multipliedBy(factor))
-      .div(2)
-      .toNumber();
-    const wholeOffsetY = BigNumber(canvasY)
-      .minus(BigNumber(canvasY).multipliedBy(factor))
-      .div(2)
-      .toNumber();
+  //   const ctx = canvasRef.current.getContext("2d")!;
+  //   const lastSource = source.slice(-1)[0];
+  //   const index = source?.length - 1;
+  //   const backImg = await loadImage(require("../assets/images/bullV2.png"));
+  //   const { canvasX, offsetX, canvasY, offsetY, max, diff } = initParam;
 
-    const x = new BigNumber(index)
-      .dividedBy(index)
-      .multipliedBy(offsetX)
-      .plus(TREND_LINE_DIAM)
-      .multipliedBy(factor || 0)
-      .plus(wholeOffsetX)
-      .toNumber();
+  //   ctx.clearRect(0, 0, canvasX, canvasY);
 
-    const y = new BigNumber(max)
-      .minus(lastSource?.c)
-      .dividedBy(diff)
-      .multipliedBy(offsetY)
-      .plus(TREND_LINE_DIAM)
-      .multipliedBy(factor || 0)
-      .plus(wholeOffsetY)
-      .toNumber();
+  //   const wholeOffsetX = BigNumber(canvasX)
+  //     .minus(BigNumber(canvasX).multipliedBy(factor))
+  //     .div(2)
+  //     .toNumber();
+  //   const wholeOffsetY = BigNumber(canvasY)
+  //     .minus(BigNumber(canvasY).multipliedBy(factor))
+  //     .div(2)
+  //     .toNumber();
 
-    ctx.drawImage(backImg, x - 250, y - 250, 500, 550);
-  };
+  //   const _x = new BigNumber(index)
+  //     .dividedBy(index)
+  //     .multipliedBy(offsetX)
+  //     .plus(TREND_LINE_DIAM)
+  //     .multipliedBy(factor || 0)
+  //     .plus(wholeOffsetX)
+  //     .toNumber();
+
+  //   const _y = new BigNumber(max)
+  //     .minus(lastSource?.c)
+  //     .dividedBy(diff)
+  //     .multipliedBy(offsetY)
+  //     .plus(TREND_LINE_DIAM)
+  //     .multipliedBy(factor || 0)
+  //     .plus(wholeOffsetY)
+  //     .toNumber();
+
+  //   const moveX = x || (_x - 250);
+  //   const moveY = y || (_y - 250);
+
+  //   ctx.drawImage(backImg, moveX, moveY, 500, 550);
+  // };
 
   React.useEffect(() => {
-    if(!canvasSize?.width) return;
+    if (!canvasSize?.width) return;
     drawTrend();
-    drawTooltip();
+    // drawTooltip();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initParam, source, type, canvasSize?.width]);
 
   React.useEffect(() => {
     if (canvasSize?.width && dataPoints?.length) {
-        mouseMove();
+      mouseMove();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canvasSize, dataPoints, initParam, source, type]);
+  }, [canvasSize?.width, dataPoints?.length]);
 
   const mouseMove = () => {
     if (
       !canvasRef ||
-      !canvasRef.current ||
+      !wrapperRef.current ||
       !initParam ||
       !source ||
       !canvasSize?.width
     )
       return;
 
-    canvasRef.current.addEventListener("mousemove", (e) => {
+    wrapperRef.current.addEventListener("mousemove", (e: any) => {
       const rect = canvasRef.current!.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      const singleFactorX = BigNumber(canvasSize?.width)
-        .div(source.length)
-        .toNumber();
-
-      const singleFactorY = BigNumber(canvasSize?.height)
-        .div(source.length)
-        .toNumber();
-      // console.log("singleFactor", singleFactorX, source);
-      // const dataPoints = source.map((i, index) => ({
-      //   ...i,
-      //   x: index * singleFactorX,
-      //   y: index * singleFactorY,
-      // }));
-
-      console.log("dataPoints", dataPoints);
-
       for (const point of dataPoints) {
-        // 计算鼠标与点的距离
-        const distance = Math.sqrt(
-          (mouseX - point.x) ** 2 + (mouseY - point.y) ** 2
-        );
-
-        if (distance <= 5) {
-          // 如果距离小于点的半径，则鼠标在点上
-          console.log(`Mouse is over point (${point.x}, ${point.y})`);
-          break; // 如果找到了一个点，就不用继续循环了
+        if (
+          BigNumber(mouseX)
+            .minus(point.x)
+            .abs()
+            .lte(5)
+        ) {
+          setImgPosition({
+            left: mouseX - 50 + "px",
+            top: 1 * (point.y - 100) + "px",
+          });
         }
       }
     });
   };
 
   return (
-    <Wrapper size={size}>
+    <Wrapper size={size} ref={wrapperRef}>
       {initParam && (
-        <canvas
-          width={initParam.canvasX}
-          height={initParam.canvasY}
-          ref={canvasRef}
-        />
+        <>
+          <div style={{ maxWidth: "70%" }}>
+            <canvas
+              width={initParam.canvasX}
+              height={initParam.canvasY}
+              ref={canvasRef}
+            />
+          </div>
+
+          <img
+            style={imgPosition}
+            className="tooltip"
+            src={require("../assets/images/bullV2.svg").default}
+          />
+        </>
       )}
     </Wrapper>
   );

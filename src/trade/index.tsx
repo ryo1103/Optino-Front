@@ -58,6 +58,11 @@ const useStyles = createStyles((theme) => ({
     position: "fixed",
     bottom: 0,
   },
+  countDownContainer: {
+    position: 'absolute',  
+    right: '60px',
+    top: '0px'
+  },
   countDown: {
     width: "220px",
     height: "60px",
@@ -343,8 +348,8 @@ function Trade() {
 
   return (
     <Header>
-      <Group position="right">
-        <div style={{ width: "28%" }}>
+      <Group position="right" className={classes.countDownContainer}>
+        <div>
           <BackgroundImage
             src={time}
             style={{
@@ -358,7 +363,6 @@ function Trade() {
             // style={{width:'300px',height:'100px'}}
           >
             <div className={classes.countDown}>
-              {" "}
               {`${Hours}:${Minutes}:${Seconds}`}
             </div>
           </BackgroundImage>
@@ -369,8 +373,8 @@ function Trade() {
         {/* <Group style={{ padding: "20px", width: "50%", height: "280px" }} position="right">
         <Trend data={data}/>
         </Group> */}
-        <Group style={{ padding: "20px", width: "60%", height: "280px" }} position="right">
-        <Trend data={data} factor={0.8}/>
+        <Group style={{ padding: "20px", minWidth: '867px', width: "100%", height: "70vh" }} position="right">
+            <Trend data={data} factor={0.8}/>
         </Group>
         
       </Group>
