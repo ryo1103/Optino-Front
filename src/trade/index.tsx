@@ -1,7 +1,15 @@
 import {
-  BackgroundImage, Button, createStyles, Flex, Grid, Group, NumberInput, Space, Text
+  BackgroundImage,
+  Button,
+  createStyles,
+  Flex,
+  Grid,
+  Group,
+  NumberInput,
+  Space,
+  Text
 } from "@mantine/core";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
@@ -9,7 +17,7 @@ import { useWeb3React } from "@web3-react/core";
 import { useCountDown, useRequest } from "ahooks";
 import { ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import time from "../assets/images/time.png";
 import Header from "../compoments/header";
 import { option, usdt } from "../config";
@@ -26,7 +34,13 @@ import { ContractCallContext, Multicall } from "ethereum-multicall";
 import eth from "../assets/images/eth.png";
 import line from "../assets/images/line.png";
 // import Trend from "../compoments/trend";
+import BigNumber from "bignumber.js";
+import { Options } from "../App";
 import Trend from "../compoments/trendV2";
+import useKLine from "../hook/useKline";
+import useMyPosition from "../hook/useMyPosition";
+
+const onlyMax = true;
 
 const maxAllowance =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
@@ -150,25 +164,22 @@ const useStyles = createStyles((theme) => ({
     },
   },
   wrapper: {
-    borderBottom:'1px solid #07005C',
-    fontSize:'20px'
+    borderBottom: "1px solid #07005C",
+    fontSize: "20px",
   },
-  rightSection:{
-    right:'20px'
+  rightSection: {
+    right: "20px",
   },
   input: {
-
-    fontSize:'20px'
+    fontSize: "20px",
   },
 }));
 
 const testTime = 1677858179002;
 
-
 function Trade() {
   const context = useWeb3React();
   const connectWallet = async () => {
-    console.log(222);
     try {
       await context.activate(injected);
     } catch (ex) {
@@ -185,19 +196,15 @@ function Trade() {
   const Optimistic = useOptionContract(option);
   const [USDCAllowance, setUSDCAllowance] = useState(0);
   const [optionPrice, setOptionPrice] = useState(0);
-  const [optionAdd ,setOptionAdd] = useState('')
-  const [info, setInfo] = useState<any>(null)
-  const [expiry, setExpiry] = useState<any>()
-  const [strikePrice, setStrikePrice] = useState(0)
-  const [inputAmount, setInputAmount] = useState(0)
+  const [optionAdd, setOptionAdd] = useState("");
+  const [info, setInfo] = useState<any>(null);
+  const [expiry, setExpiry] = useState<any>();
+  const [strikePrice, setStrikePrice] = useState(0);
+  const [inputAmount, setInputAmount] = useState(0);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-
-    const endT = dayjs.unix(expiry);
-    const startT = dayjs();
-    const diff = endT.diff(startT); // 时间差
-
+  const optionProvider: any = useContext(Options);
 
   const getIndexPrice = () => {
     return fetch(`https://gmx-server-mainnet.uw.r.appspot.com/prices`, {
@@ -208,7 +215,7 @@ function Trade() {
   };
 
   const {
-    data: indexPrice,
+    data: gmxIndexPrice,
     loading: indexPricLoading,
     run: queryIndexPrice,
   } = useRequest(() => getIndexPrice(), {
@@ -217,17 +224,13 @@ function Trade() {
     //  refreshDeps: [account]
   });
 
-  useEffect(() => {
-    // console.log('!!!',period)
-    // queryIndexPrice();
-  }, []);
-
   const handleIndex = useCallback(async () => {
     // console.log('getOptionsRes', getOptionsRes, getOptionsRes?.status, getOptionsRes?.body)
 
-    const resText: any = await indexPrice?.text();
+    const resText: any = await gmxIndexPrice?.text();
     const response = JSON.parse(resText);
-    let httpCode = indexPrice?.status;
+    console.log("response", response);
+    let httpCode = gmxIndexPrice?.status;
     if (httpCode === 200) {
       // const result = response.result;
       //('price data', response)
@@ -241,27 +244,38 @@ function Trade() {
         console.log("get index price err", e);
       }
     }
-  }, [indexPrice]);
+  }, [gmxIndexPrice]);
 
   useEffect(() => {
-    if (indexPrice) {
+    if (gmxIndexPrice) {
       handleIndex();
     }
-  }, [indexPrice]);
+  }, [gmxIndexPrice]);
 
-  const [countdown, formattedRes] = useCountDown({
-    targetDate: dayjs.unix(expiry),
-    // onEnd:()=>{ console.log(1111);navigate("/result/success")}
+  const endT = dayjs.unix(expiry);
+  const startT = dayjs();
+  const diff = endT.diff(startT); // 时间差
+
+  const [, formattedRes] = useCountDown({
+    leftTime: diff,
   });
   const { hours, minutes, seconds } = formattedRes;
 
-  const Hours = !hours ? '00' : hours < 10 ? "0" + hours : hours.toString();
-  const Minutes = !minutes ? '00' : minutes < 10 ? "0" + minutes : minutes.toString();
-  const Seconds = !seconds ? '00' : seconds < 10 ? "0" + seconds : seconds.toString();
+  const Hours = !hours ? "00" : hours < 10 ? "0" + hours : hours.toString();
+  const Minutes = !minutes
+    ? "00"
+    : minutes < 10
+    ? "0" + minutes
+    : minutes.toString();
+  const Seconds = !seconds
+    ? "00"
+    : seconds < 10
+    ? "0" + seconds
+    : seconds.toString();
 
   // contract
 
-  const multiCallOptionInfo = useCallback(async (account: any, timeset:number = 0) => {
+  const multiCallOptionInfo = async (account: any, timeset: number = 0) => {
     const { ethereum } = window as any;
 
     const provider = new ethers.providers.Web3Provider(ethereum);
@@ -284,7 +298,7 @@ function Trade() {
           {
             reference: "calls",
             methodName: "calls",
-            methodParameters: [2],
+            methodParameters: [0],
           },
           {
             reference: "calls",
@@ -299,7 +313,7 @@ function Trade() {
           {
             reference: "puts",
             methodName: "puts",
-            methodParameters: [2],
+            methodParameters: [0],
           },
           {
             reference: "puts",
@@ -335,50 +349,62 @@ function Trade() {
     setLoading(true);
     const multiCallResult = await multicall.call(contractCallContext);
 
-    let add = multiCallResult.results.optino.callsReturnContext[0].returnValues[0]
-    let usdcAllowence = multiCallResult.results.usdc.callsReturnContext[0].returnValues[0]
-    let usdcBalance = multiCallResult.results.usdc.callsReturnContext[1].returnValues[0]
+    let add =
+      multiCallResult.results.optino.callsReturnContext[0].returnValues[0];
+    let usdcAllowence =
+      multiCallResult.results.usdc.callsReturnContext[0].returnValues[0];
+    let usdcBalance =
+      multiCallResult.results.usdc.callsReturnContext[1].returnValues[0];
 
-    const allLevelsCallList = multiCallResult.results.optino.callsReturnContext.slice(1, 1+3)?.map(i=>i?.returnValues)
-    const allLevelsPutList = multiCallResult.results.optino.callsReturnContext.slice(4, 4+3)?.map(i=>i?.returnValues)
+    const allLevelsCallList = multiCallResult.results.optino.callsReturnContext
+      .slice(1, 1 + 3)
+      ?.map((i) => i?.returnValues);
+    const allLevelsPutList = multiCallResult.results.optino.callsReturnContext
+      .slice(4, 4 + 3)
+      ?.map((i) => i?.returnValues);
 
-    let callList = checkExpires(allLevelsCallList) || []
-    let putList = checkExpires(allLevelsPutList) || []
+    let callList: any = [];
+    let putList: any = [];
 
-    console.log(callList, putList)
+    if (onlyMax) {
+      callList = allLevelsCallList.slice(-1)[0];
+      putList = allLevelsPutList.slice(-1)[0];
+    } else {
+      callList = checkExpires(allLevelsCallList) || [];
+      putList = checkExpires(allLevelsPutList) || [];
+    }
+
+    optionProvider.setOptions({
+      CALL: allLevelsCallList,
+      PUT: allLevelsPutList,
+    });
 
     // let callList = multiCallResult.results.optino.callsReturnContext[1].returnValues
     // let putList = multiCallResult.results.optino.callsReturnContext[2].returnValues
 
-
-    setOptionAdd(ethers.BigNumber.from(add).toString())
+    setOptionAdd(ethers.BigNumber.from(add).toString());
     // console.log( callList,'call')
-    let res=  callList.map((item:any)=>{
-       // console.log(ethers.BigNumber.from(item).toString())
-        return ethers.BigNumber.from(item).toString()
-    })
-    let putRes = putList.map((item:any)=>{
+    let res = callList.map((item: any) => {
+      // console.log(ethers.BigNumber.from(item).toString())
+      return ethers.BigNumber.from(item).toString();
+    });
+    let putRes = putList.map((item: any) => {
       //  console.log(ethers.BigNumber.from(item).toString())
-        return ethers.BigNumber.from(item).toString()
-    })
+      return ethers.BigNumber.from(item).toString();
+    });
 
-    setInfo({CALL:res, PUT:putRes})
-    setExpiry(Number(res[0]))
-    console.log(dayjs(expiry* 1000).format(),dayjs().format())
+    setInfo({ CALL: res, PUT: putRes });
+    setExpiry(Number(res[0]));
 
-    console.log(multiCallResult,'res')
-
-    console.log(formatUnits( ethers.BigNumber.from(usdcAllowence).toString(),18))
-    console.log(formatUnits( ethers.BigNumber.from(usdcBalance).toString(),18))
-
-    setUSDCAllowance(Number(formatUnits( ethers.BigNumber.from(usdcAllowence).toString(),18)))
-    setBalance(Number(formatUnits( ethers.BigNumber.from(usdcBalance).toString(),18)))
+    setUSDCAllowance(
+      Number(formatUnits(ethers.BigNumber.from(usdcAllowence).toString(), 18))
+    );
+    setBalance(
+      Number(formatUnits(ethers.BigNumber.from(usdcBalance).toString(), 18))
+    );
     setLoading(false);
-   
-  }, []);
+  };
 
-
-  
   const multiOptionPrice = useCallback(
     async (expiry: any, strike: number, iscall: boolean) => {
       const { ethereum } = window as any;
@@ -419,23 +445,21 @@ function Trade() {
     []
   );
 
-  const { run: multiCallOptionInfoRun, cancel: multiCallOptionInfoCancel } = useRequest(
-    (account, timeset) => multiCallOptionInfo(account, timeset),
-    {
-      pollingInterval: 50000,
-      manual: true,
-    }
-  );
+  const {
+    run: multiCallOptionInfoRun,
+    cancel: multiCallOptionInfoCancel,
+  } = useRequest((account, timeset) => multiCallOptionInfo(account, timeset), {
+    pollingInterval: 50000,
+    manual: true,
+  });
 
   useEffect(() => {
     if (account) {
-      multiCallOptionInfoRun(account, 0);
+      multiCallOptionInfoRun(account, 2);
     } else {
       setBalance(0);
-
-      //init();
     }
-  }, [account, multiCallOptionInfoRun]);
+  }, [account]);
 
   const { run: multiOptionPriceRun } = useRequest(
     (expiry, strikePrice, select) =>
@@ -448,14 +472,9 @@ function Trade() {
 
   useEffect(() => {
     if (expiry && select && strikePrice) {
-      // @ts-igonre
       multiOptionPriceRun(expiry, strikePrice, select);
-    } else {
-      // setBalance(0);
-
-      //init();
     }
-  }, [account, multiOptionPriceRun, expiry && select && strikePrice]);
+  }, [expiry, select, strikePrice]);
 
   const { runAsync: approve } = useRequest(
     () => tokenContract?.approve(option, maxAllowance),
@@ -471,8 +490,8 @@ function Trade() {
   );
 
   const traderBuy = async () => {
-    if(!account) {
-      connectWallet()
+    if (!account) {
+      connectWallet();
       return;
     }
 
@@ -485,14 +504,20 @@ function Trade() {
         console.log("approve res ", _res);
         // setApproveLoading(false)
       }
-      const params = [expiry, strikePrice, inputAmount, select==='CALL']
-      console.table(params)
+      const params = [expiry, strikePrice, inputAmount, select === "CALL"];
+      console.table(params);
       const res = await Optimistic?.buyOption(...params);
       const _res = await res.wait();
       let { status, transactionHash } = _res;
       console.log("_res", _res);
       if (status) {
-        console.log(expiry,strikePrice, inputAmount, select==='CALL' , 'buy config');
+        console.log(
+          expiry,
+          strikePrice,
+          inputAmount,
+          select === "CALL",
+          "buy config"
+        );
         setPaid(!paid);
         showNotification({
           title: "Successfully",
@@ -519,18 +544,43 @@ function Trade() {
     }
   };
 
-  function buy() {
-    setPaid(!paid);
-  }
-
+  const curSelectedInfo = useMemo(() => (info ? info[select] : null), [
+    info,
+    select,
+  ]);
 
   useEffect(() => {
-    //@ts-ignore
-    if (info) {
+    if (curSelectedInfo) {
       //@ts-ignore
-      setStrikePrice(Number(info[select][info[select].length - 3]));
+      setStrikePrice(Number(curSelectedInfo[curSelectedInfo.length - 2]));
     }
-  }, [info, select]);
+  }, [curSelectedInfo]);
+
+  const balances = useMyPosition();
+
+  const { data }: any = useKLine();
+  const indexPrice = useMemo(() => {
+    if (!data) return "-";
+    return BigNumber(data?.slice(-1)[0]?.value).toFixed(2);
+  }, [data]);
+
+  const handleExercise = () => {
+    // exerciseRun(balances[select]?.id, balances[select][`${select}_24h_2`])
+    if(!indexPrice) return ;
+    if (BigNumber(indexPrice).gt(strikePrice)) {
+      if (select === "CALL") {
+        navigate(`/result/success?strikePrice=${strikePrice}&indexPrice=${indexPrice}`);
+      } else {
+        navigate(`/result/fail?strikePrice=${strikePrice}&indexPrice=${indexPrice}`);
+      }
+    }else{
+      if (select === "PUT") {
+        navigate(`/result/success?strikePrice=${strikePrice}&indexPrice=${indexPrice}`);
+      } else {
+        navigate(`/result/fail?strikePrice=${strikePrice}&indexPrice=${indexPrice}`);
+      }
+    }
+  };
 
   return (
     <Header>
@@ -562,12 +612,12 @@ function Trade() {
             minWidth: "867px",
             width: "74%",
             height: "50vh",
-            justifyContent: 'flex-start'
+            justifyContent: "flex-start",
           }}
           position="right"
         >
           {/* <Trend data={data} factor={0.8} /> */}
-          <Trend strikePrices={info}/>
+          <Trend strikePrices={info} data={data} />
         </Group>
       </Group>
 
@@ -594,7 +644,12 @@ function Trade() {
               Asset
             </Text>
             <Text c="#07005C" fz={20}>
-                <img src={eth}  width={14} alt="eth logo" style={{marginRight:'5px'}} />
+              <img
+                src={eth}
+                width={14}
+                alt="eth logo"
+                style={{ marginRight: "5px" }}
+              />
               ETH
             </Text>
           </Flex>
@@ -631,6 +686,14 @@ function Trade() {
                 PUT
               </Button>
             </Flex>
+            {balances[select] ? (
+              <>
+                <Space h="sm" />
+                <Text color={"rgba(0,0,0,0.4)"}>
+                  Current Hold: {balances[select][`${select}_24h_2`]}
+                </Text>
+              </>
+            ) : null}
           </Flex>
           <Flex direction={"column"} style={{ color: "transparent" }}>
             <Text c="transparent" fz={20}>
@@ -655,20 +718,20 @@ function Trade() {
             <Text c="#1300F2" fz={20}>
               Enter Amount
             </Text>
-            <Text c="#07005C" fz={20}>
-              
-            </Text>
+            <Text c="#07005C" fz={20}></Text>
             <NumberInput
-            variant="unstyled"
-            placeholder="0"
-            classNames={{wrapper : classes.wrapper, rightSection : classes.rightSection,input:classes.input}}
-            value={inputAmount}
-            onChange={(val:any) =>setInputAmount(val)}
-            rightSection={select==='CALL' ? 'Calls' :'Puts'}
-            w='75%'
-            >
-
-            </NumberInput>
+              variant="unstyled"
+              placeholder="0"
+              classNames={{
+                wrapper: classes.wrapper,
+                rightSection: classes.rightSection,
+                input: classes.input,
+              }}
+              value={inputAmount}
+              onChange={(val: any) => setInputAmount(val)}
+              rightSection={select === "CALL" ? "Calls" : "Puts"}
+              w="75%"
+            ></NumberInput>
           </Flex>
         </Grid.Col>
         <Grid.Col span={2} p="0">
@@ -708,7 +771,18 @@ function Trade() {
             loading={loading}
             disabled={!inputAmount || !Number(inputAmount)}
           >
-            { !account ? 'Connect' : !USDCAllowance ? 'Approve' : 'Confirm'}
+            {!account ? "Connect" : !USDCAllowance ? "Approve" : "Confirm"}
+          </Button>
+          <Space h="xl" />
+          <Button
+            classNames={{ root: paid ? classes.diable : classes.confirm }}
+            size="md"
+            radius="md"
+            // loading={exerciseLoading}
+            onClick={handleExercise}
+            disabled={!indexPrice || !account}
+          >
+            Exercise
           </Button>
         </Grid.Col>
 

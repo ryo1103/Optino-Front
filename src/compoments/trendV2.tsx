@@ -2,7 +2,6 @@ import { useMount } from "ahooks";
 import BigNumber from "bignumber.js";
 import { createChart, IChartApi, LineStyle } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
-import useKLine from "../hook/useKline";
 
 type StrikePrices = {
   CALL: [];
@@ -27,8 +26,13 @@ let drawed = false;
 //         "1571"
 //     ]
 // }
-const Trend = ({ strikePrices }: { strikePrices: StrikePrices }) => {
-  const { data }: any = useKLine();
+const Trend = ({
+  data,
+  strikePrices,
+}: {
+  data: any;
+  strikePrices: StrikePrices;
+}) => {
 
   const target: any = useRef();
   const [currentChart, setCurrentChart]: any = useState(null);

@@ -117,7 +117,7 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
     if (data?.length) {
       filterTrend();
     }
-  }, [data]);
+  }, [data?.length]);
 
   const drawTrend = React.useCallback(() => {
     if (!canvasRef || !canvasRef.current || !initParam || !canvasSize?.width)
@@ -211,7 +211,7 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
     ctx.lineJoin = "round";
     ctx.lineWidth = TREND_LINE_DIAM;
     ctx.stroke(line);
-  }, [canvasSize, factor, initParam, source]);
+  }, [canvasSize, factor, imgPosition.left, initParam, source]);
 
   React.useEffect(() => {
     if (!canvasSize?.width) return;

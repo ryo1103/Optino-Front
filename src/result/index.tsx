@@ -1,13 +1,10 @@
-import { Button, Text, BackgroundImage, Container, Group, Image, SegmentedControl, Grid, Divider, Space, createStyles, Select, Stack, Flex, Paper, Input, TextInput, Slider, Drawer, Title, Modal, Tooltip,Box, List,Mark} from '@mantine/core';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { BackgroundImage, Button, createStyles, Flex, Group, Text, Title } from '@mantine/core';
 
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import cat from '../assets/images/cat1.png';
+import sad from '../assets/images/sad.png';
 import Header from '../compoments/header';
-import time from '../assets/images/time.png'
-import { injected } from '../connectors';
-import { useWeb3React } from '@web3-react/core';
-import { useNavigate,useLocation} from 'react-router-dom';
-import cat from '../assets/images/cat1.png'
-import sad from '../assets/images/sad.png'
+import useMyPosition from '../hook/useMyPosition';
 
  
 const useStyles = createStyles((theme) => ({
@@ -33,9 +30,13 @@ function Result (){
     const { classes, cx } = useStyles();
     const navigate = useNavigate();
     const {pathname} = useLocation()
+    const [searchParams,setSearchParams]= useSearchParams();
+
+    const strikePrice = searchParams.get("strikePrice")
+    const indexPrice = searchParams.get("indexPrice")
     
 
-
+    useMyPosition()
 
 
 
@@ -55,13 +56,13 @@ function Result (){
                     <Flex direction={'column'} mt={20}>
                         
                         <Text c='#fff' fz={20}>Current Price</Text>
-                        <Title c='#fff' order={4}>{pathname.includes('success') ? '1660.00' :'1640.00'}</Title>
-                        <Text c='#fff' fz={20}>04:15pm</Text>
+                        <Title c='#fff' order={4}>{indexPrice}</Title>
+                        {/* <Text c='#fff' fz={20}>04:15pm</Text> */}
                     </Flex>
                     <Flex direction={'column'} mt={40}>
                         <Text c='#07005C' fz={20}>Strike Price</Text>
-                        <Title c='#07005C' order={4}>1650.00</Title>
-                        <Text c='#07005C' fz={20}>04:15pm</Text>
+                        <Title c='#07005C' order={4}>{strikePrice}</Title>
+                        {/* <Text c='#07005C' fz={20}>04:15pm</Text> */}
                     </Flex>
 
 

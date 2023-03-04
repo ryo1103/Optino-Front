@@ -1,21 +1,20 @@
-import { Button, Text, Container, Group, Image, NumberInput,SegmentedControl, Grid, Divider, Space, createStyles, Select, Stack, Flex, Paper, Input, TextInput, Slider, Drawer, Title, Modal, Tooltip,Box, List,Mark} from '@mantine/core';
-import { hover } from '@testing-library/user-event/dist/hover';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useWeb3React } from "@web3-react/core";
-import { BigNumber, ethers } from "ethers";
-import { Multicall, ContractCallResults,ContractCallContext } from 'ethereum-multicall';
+import { Button, createStyles, Group, Modal, NumberInput, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { showNotification } from "@mantine/notifications";
-import { option, usdt, LPShares} from "../config";
-import optionAbi from "../config/optino.json"
-import usdtAbi from "../config/USDC.json"
-import { formatUnits } from "ethers/lib/utils";
-import {  useRequest } from "ahooks";
 import { IconCheck, IconX } from "@tabler/icons";
+import { useWeb3React } from "@web3-react/core";
+import { useRequest } from "ahooks";
+import { ContractCallContext, Multicall } from 'ethereum-multicall';
+import { ethers } from "ethers";
+import { formatUnits } from "ethers/lib/utils";
+import { useCallback, useEffect, useState } from 'react';
+import { LPShares, option, usdt } from "../config";
+import optionAbi from "../config/optino.json";
+import usdtAbi from "../config/USDC.json";
 import { injected } from "../connectors";
 import {
-    useOptionContract, useTokenContract
+  useOptionContract, useTokenContract
 } from "../hook/useContract";
-import { useDisclosure } from '@mantine/hooks';
 
 
 import Header from '../compoments/header';
@@ -232,7 +231,7 @@ const useStyles = createStyles((theme) => ({
     
           //init();
         }
-      }, [account, multiCallLPInfoRun]);
+      }, [account]);
 
       //deposit
 

@@ -5,28 +5,37 @@ import WebSocket from "websocket";
 
 
 // const ws = new WebSocket.w3cwebsocket("wss://stream.binance.com:9443/ws");
-const ws = new WebSocket.w3cwebsocket("wss://ws-api.binance.com:443/ws-api/v3");
+
 
 const useKLine = () => {
   const [data, setData] = useState([]);
+  const [ws, setWs]: any = useState(null)
 
   const sendPong = () => {};
 
   const sendMessage = async (limit: any) => {
+    if(!ws) return;
     // 发送订阅消息
-    ws.send(
-      JSON.stringify({
-        id: "b137468a-fb20-4c06-bd6b-625148eec958",
-        method: "uiKlines",
-        params: {
-          symbol: "ETHUSDT",
-          interval: "1s",
-          // startTime: 1655969280000,
-          limit,
-        },
-      })
-    );
+    try{
+      ws.send(
+        JSON.stringify({
+          id: "b137468a-fb20-4c06-bd6b-625148eec958",
+          method: "uiKlines",
+          params: {
+            symbol: "ETHUSDT",
+            interval: "1s",
+            // startTime: 1655969280000,
+            limit,
+          },
+        })
+      );
     return Promise.resolve("DONE");
+
+    }catch(e){
+      console.log('e', e)
+      ws.close()
+    }
+   
   };
 
   const { run: getFullData } = useRequest(() => sendMessage(200), {
@@ -39,9 +48,15 @@ const useKLine = () => {
   });
 
   const startSocket = () => {
+    console.log('ws.send(',1)
+    const ws = new WebSocket.w3cwebsocket("wss://ws-api.binance.com:443/ws-api/v3");
+    setWs(ws)
     ws.onopen = () => {
       getFullData();
     };
+    ws.onerror = (event: any) =>{
+      console.log('event', event)
+    }
     ws.onmessage = (event: any) => {
       const data = JSON.parse(event.data);
     //   console.log("data", data, event); // todo 检查pong
@@ -85,7 +100,7 @@ const useKLine = () => {
     if (data?.length) {
       getSingleData();
     }
-  }, [data?.length, getSingleData]);
+  }, [data?.length]);
 
   useMount(() => startSocket());
 

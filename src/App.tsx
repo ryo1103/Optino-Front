@@ -1,5 +1,5 @@
 import { BackgroundImage } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from "react-router-dom";
 import About from './about';
 import './App.css';
@@ -13,11 +13,16 @@ import Stake from './stake';
 import Trade from './trade';
 
 // const Trade = lazy(() => import("./trade"));
+export const Options: any =  createContext(null)
 
 
 function App() {
   const [back, setBack]= useState('')
   const { pathname } = useLocation();
+
+  const [options, setOptions] = useState([])
+  const [rewards, setRewards] = useState(null)
+
   useEffect(()=>{
     console.log(pathname)
     if (pathname.includes('trade') ||  pathname==='/'){
@@ -39,7 +44,12 @@ function App() {
   },[pathname])  
 
   return (
-    <>
+    <Options.Provider value={{
+      options,
+      setOptions,
+      rewards,
+      setRewards
+    }}>
     
      <BackgroundImage
         src={back}
@@ -51,14 +61,16 @@ function App() {
       <Route path="/trade" element={<Trade />}/>
       <Route path="/about" element={<About />}/>
       <Route path="/stake" element={<Stake/>}/>
+      {/* <Route path="/result" element={<Result/>}/> */}
       <Route path="/result/success" element={<Result/>}/>
       <Route path="/result/fail" element={<Result/>}/>
+      
 
 
      {/* <Route path="/stake" element={<Vaults/>} /> */}
     </Routes>
       </BackgroundImage>
-    </>
+    </Options.Provider>
   );
 }
 
