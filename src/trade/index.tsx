@@ -314,24 +314,32 @@ function Trade() {
     let add = multiCallResult.results.optino.callsReturnContext[0].returnValues[0]
     let callList = multiCallResult.results.optino.callsReturnContext[1].returnValues
     let putList = multiCallResult.results.optino.callsReturnContext[2].returnValues
+    let usdcAllowence = multiCallResult.results.usdc.callsReturnContext[0].returnValues[0]
+    let usdcBalance = multiCallResult.results.usdc.callsReturnContext[1].returnValues[0]
 
     setOptionAdd(ethers.BigNumber.from(add).toString())
-    console.log( callList,'call')
+    // console.log( callList,'call')
     let res=  callList.map((item:any)=>{
-        console.log(ethers.BigNumber.from(item).toString())
+       // console.log(ethers.BigNumber.from(item).toString())
         return ethers.BigNumber.from(item).toString()
     })
     let putRes = putList.map((item:any)=>{
-        console.log(ethers.BigNumber.from(item).toString())
+      //  console.log(ethers.BigNumber.from(item).toString())
         return ethers.BigNumber.from(item).toString()
     })
 
-    console.log(res, putRes)  
+   // console.log(res, putRes)  
     setInfo({CALL:res, PUT:putRes})
     setExpiry(Number(res[0])* 1000)
-    console.log(dayjs(expiry).format())
+   // console.log(dayjs(expiry).format())
 
     console.log(multiCallResult,'res')
+
+    console.log(formatUnits( ethers.BigNumber.from(usdcAllowence).toString(),18))
+    console.log(formatUnits( ethers.BigNumber.from(usdcBalance ).toString(),18))
+
+    setUSDCAllowance(Number(formatUnits( ethers.BigNumber.from(usdcAllowence).toString(),18)))
+    setBalance(Number(formatUnits( ethers.BigNumber.from(usdcBalance).toString(),18)))
    
   }, []);
 
@@ -368,13 +376,12 @@ function Trade() {
     let price = multiCallResult.results.optino.callsReturnContext[0].returnValues[0]
     //formatUnits(ethers.BigNumber.from(multiCallRes[1].returnValues[0]).toString(), 8)
 
-    console.log(formatUnits(ethers.BigNumber.from(price).toString(),18))
+    console.log(ethers.BigNumber.from(price).toString(),price)
     setOptionPrice(Number(formatUnits(ethers.BigNumber.from(price).toString(),18)))
 
-
-    console.log(multiCallResult,'res')
+    console.log(multiCallResult,'price')
    
-  }, []);
+  }, [expiry,strikePrice, select]);
 
   
 
@@ -446,14 +453,13 @@ function Trade() {
         console.log("approve res ", _res);
         // setApproveLoading(false)
       }
-      let amount = 50;
 
-      const res = await Optimistic?.buyOption(23948, 1750, amount, true);
+      const res = await Optimistic?.buyOption(expiry,strikePrice, inputAmount, select==='CALL');
       const _res = await res.wait();
       let { status, transactionHash } = _res;
       console.log("_res", _res);
       if (status) {
-        console.log(Number(amount).toFixed());
+        console.log(expiry,strikePrice, inputAmount, select==='CALL' , 'buy config');
         setPaid(!paid);
         showNotification({
           title: "Successfully",
@@ -645,7 +651,7 @@ function Trade() {
               Total Cost
             </Text>
             <Text c="#07005C" fz={20}>
-              $1,647
+              ${inputAmount * optionPrice}
             </Text>
           </Flex>
         </Grid.Col>
@@ -665,7 +671,7 @@ function Trade() {
             radius="md"
             onClick={traderBuy}
           >
-            Confirm
+            { account === 'undefined' ? 'Connect' :'Confirm'}
           </Button>
         </Grid.Col>
 
