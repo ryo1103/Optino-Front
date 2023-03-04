@@ -17,7 +17,7 @@ const Wrapper = styled.div<{ size: { width: number; height: number } }>`
   width: 100%;
   height: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   canvas {
     width: 100%;
     height: 100%;
@@ -173,7 +173,7 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
       if(index === cur.length - 1 ){
         setImgPosition({
           left: (pointX - 50) + 'px',
-          top: (pointY - 100) + 'px'
+          top: (pointY - 80) + 'px'
         })
       }
       
@@ -281,7 +281,7 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
         ) {
           setImgPosition({
             left: mouseX - 50 + "px",
-            top: 1 * (point.y - 100) + "px",
+            top: 1 * (point.y - 80) + "px",
           });
         }
       }
