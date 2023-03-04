@@ -55,7 +55,7 @@ function Result (){
                     <Flex direction={'column'} mt={20}>
                         
                         <Text c='#fff' fz={20}>Current Price</Text>
-                        <Title c='#fff' order={4}>{pathname.includes('success') ? '1640.00' :'1660.00'}</Title>
+                        <Title c='#fff' order={4}>{pathname.includes('success') ? '1660.00' :'1640.00'}</Title>
                         <Text c='#fff' fz={20}>04:15pm</Text>
                     </Flex>
                     <Flex direction={'column'} mt={40}>

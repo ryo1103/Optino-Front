@@ -260,7 +260,7 @@ const useStyles = createStyles((theme) => ({
             console.log("approve res ", _res);
             // setApproveLoading(false)
           }
-          const res = await Optimistic?.liquidityDeposit(inputAmount);
+          const res = await Optimistic?.liquidityDeposit(ethers.utils.parseUnits(inputAmount.toString(),18));
           const _res = await res.wait();
           let { status, transactionHash } = _res;
           console.log("_res", _res);
@@ -288,6 +288,7 @@ const useStyles = createStyles((theme) => ({
             color: "red",
           });
         }
+        setInputAmount(0)
       };
 
       const withdrawRequest = async () => {
@@ -299,7 +300,7 @@ const useStyles = createStyles((theme) => ({
             console.log("approve res ", _res);
             // setApproveLoading(false)
           }
-          const res = await Optimistic?.requestLiquidityWithdraw(inputAmount);
+          const res = await Optimistic?.requestLiquidityWithdraw(ethers.utils.parseUnits(inputAmount.toString(),18));
           const _res = await res.wait();
           let { status, transactionHash } = _res;
           console.log("_res", _res);
@@ -327,6 +328,7 @@ const useStyles = createStyles((theme) => ({
             color: "red",
           });
         }
+        setInputAmount(0)
       };
 
 
@@ -335,11 +337,11 @@ const useStyles = createStyles((theme) => ({
         <Header>
             <Group align={'start'} position="apart" ml={120} mr={120} mt={90} >
                 <Title  order={3} c='#07005C' fw={400}>Stake </Title>
-                <Title  order={3} c='#07005C' fw={400}>{stake} </Title>
+                <Title  order={3} c='#07005C' fw={400}>{stake} OLPS</Title>
             </Group>
             <Group align={'start'} position="apart" ml={120} mr={120} mt={10} >
                 <Title  order={3} c='#07005C' fw={400}> Total Stake</Title>
-                <Title  order={3} c='#07005C' fw={400}>{totalStake} </Title>
+                <Title  order={3} c='#07005C' fw={400}>{totalStake} OLPS</Title>
             </Group>
             <Group align={'start'} position="apart" ml={120} mr={120} mt={10} >
                 <Title  order={3} c='#07005C' fw={400}>LP Token Price</Title>
@@ -391,7 +393,7 @@ const useStyles = createStyles((theme) => ({
                     classNames={{wrapper : classes.wrapper, rightSection : classes.rightSection,input:classes.input}}
                     value={inputAmount}
                     onChange={(val:any) =>setInputAmount(val)}
-                    rightSection={"USDC"}
+                    rightSection={select==='Stake'? "USDC": "OLPS"}
                     w='66%'
 
                     />
