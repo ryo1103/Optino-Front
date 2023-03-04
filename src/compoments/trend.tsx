@@ -28,6 +28,13 @@ const Wrapper = styled.div<{ size: { width: number; height: number } }>`
     width: 140px;
     height: 136px;
   }
+  .current-price{
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: rgba(0,0,0,0.4);
+    transform: translate(80%, 0);
+  }
 `;
 
 // t: 时间戳，表示交易的时间或者数据更新的时间。
@@ -259,6 +266,10 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
               height={initParam.canvasY}
               ref={canvasRef}
             />
+          </div>
+
+          <div className="current-price">
+            Index Price: {BigNumber(data?.slice(-1)[0]?.c).toFixed(2)}
           </div>
 
           <img
