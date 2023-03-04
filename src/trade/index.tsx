@@ -485,7 +485,7 @@ function Trade() {
         console.log("approve res ", _res);
         // setApproveLoading(false)
       }
-      const params = [dayjs(expiry).unix(), strikePrice, inputAmount, select==='CALL']
+      const params = [expiry, strikePrice, inputAmount, select==='CALL']
       console.table(params)
       const res = await Optimistic?.buyOption(...params);
       const _res = await res.wait();
