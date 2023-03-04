@@ -109,7 +109,7 @@ const useHistoryData = () => {
 
   useEffect(() => {
     if (cuPrice) {
-      console.table(cuPrice);
+    //   console.table(cuPrice);
     }
   }, [cuPrice]);
 
