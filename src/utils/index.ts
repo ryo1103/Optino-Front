@@ -1,13 +1,11 @@
-import { Contract } from '@ethersproject/contracts';
 import { getAddress } from '@ethersproject/address';
 import { AddressZero } from '@ethersproject/constants';
+import { Contract } from '@ethersproject/contracts';
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 // @ts-ignore
 import BigNumber from "bignumber.js";
-import { option, LPShares, usdt} from '../config';
-import lpAbi from '../config/lp.json'
-import USDCAbi from '../config/USDC.json'
-import optionAbi from '../config/option.json'
+import { LPShares } from '../config';
+import lpAbi from '../config/lp.json';
 
 
 
@@ -60,7 +58,7 @@ interface SimplifyStrConfig {
   endingLength?: number; // 后面部分的长度,默认值=4
   connectSymbol: string// 前后两部分的连接符号，,默认值="..."
 }
-export const simplifyStr = (str: string, config?: SimplifyStrConfig): string => {
+export const simplifyStr = (str: string | null, config?: SimplifyStrConfig): string => {
   const defaultConfig = { frontBeginIndex: 0, frontLength: 6, connectSymbol: '...', endingLength: 4 };
   const { frontBeginIndex, frontLength, connectSymbol, endingLength } = { ...defaultConfig, ...config }
   return str ? `${str.substring(frontBeginIndex, frontBeginIndex + frontLength)}${connectSymbol}${str.substring(str.length - endingLength)}` : '-'
@@ -261,3 +259,12 @@ export const CHAIN_LIST = [
   }
 ]
 
+
+export const loadImage = (url: string): Promise<CanvasImageSource> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.addEventListener('load', () => resolve(img));
+    img.addEventListener('error', reject);
+    img.src = url;
+  });

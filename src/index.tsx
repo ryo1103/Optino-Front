@@ -1,17 +1,21 @@
+import { MantineProvider } from '@mantine/core';
+import { NotificationsProvider } from '@mantine/notifications';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import theme from './theme'
-import { CustomFonts } from './customFonts';
-import { MantineProvider } from '@mantine/core';
 import { BrowserRouter } from "react-router-dom";
-import { NotificationsProvider } from '@mantine/notifications';
+import App from './App';
+import { CustomFonts } from './customFonts';
+import './index.css';
+import reportWebVitals from './reportWebVitals';
+import theme from './theme';
+
+import "./polyfill";
+
+import { Web3Provider } from '@ethersproject/providers';
+import { Web3ReactProvider } from '@web3-react/core';
 
 
-import { Web3ReactProvider } from '@web3-react/core'
-import { Web3Provider } from '@ethersproject/providers'
+
 
 function getLibrary(provider: any): Web3Provider {
   const library = new Web3Provider(provider)
