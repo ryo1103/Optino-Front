@@ -85,7 +85,7 @@ const useKLine = () => {
       setData((old: any) => {
         const _old = JSON.parse(JSON.stringify(old));
 
-        if(_old.slice(-1)[0]?.time === trullyData[0]?.time) return _old;
+        if(_old.slice(-1)[0]?.time >= trullyData[0]?.time) return _old;
 
 
         if (_old?.length >= 800) {
