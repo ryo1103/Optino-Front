@@ -4,10 +4,30 @@ import { createChart, IChartApi, LineStyle } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
 import useKLine from "../hook/useKline";
 
+type StrikePrices = {
+  CALL: [];
+  PUT: [];
+};
+
 let chart: IChartApi | null = null;
 let drawed = false;
-
-const Trend = () => {
+// {
+//     "CALL": [
+//         "1677920131",
+//         "1665",
+//         "1623",
+//         "1598",
+//         "1571"
+//     ],
+//     "PUT": [
+//         "1677920131",
+//         "1477",
+//         "1519",
+//         "1544",
+//         "1571"
+//     ]
+// }
+const Trend = ({ strikePrices }: { strikePrices: StrikePrices }) => {
   const { data }: any = useKLine();
 
   const target: any = useRef();
@@ -26,44 +46,56 @@ const Trend = () => {
   }, [data, currentChart]);
 
   useEffect(() => {
-    if (series && !drawed) {
+    if (series && !drawed && strikePrices) {
       renderLine(series);
-      addImageTooltip(series);
     }
-  }, [series]);
+  }, [series, strikePrices, strikePrices]);
 
   const renderLine = (series: any) => {
     if (!target.current || !currentChart || !chart || drawed) return;
-
     var lineWidth = 2;
-    var callPriceLine = {
-      price: 1569.0,
-      color: "#3abe12",
-      lineWidth: lineWidth,
-      lineStyle: LineStyle.Solid,
-      axisLabelVisible: true,
-      title: "call strike price",
-    };
-    var putPriceLine = {
-      price: 1567.12,
-      color: "#2012be",
-      lineWidth: lineWidth,
-      lineStyle: LineStyle.Solid,
-      axisLabelVisible: true,
-      title: "put strike price",
-    };
 
-    series.createPriceLine(putPriceLine);
-    series.createPriceLine(callPriceLine);
+    const calls = strikePrices?.CALL?.slice(1);
+    const puts = strikePrices?.PUT?.slice(1);
+
+    if (calls?.length) {
+      calls.forEach((i: any) => {
+        const callPriceLine = {
+          price: Number(i),
+          color: "#3abe12",
+          lineWidth: lineWidth,
+          lineStyle: LineStyle.Solid,
+          axisLabelVisible: true,
+          title: "call strike price",
+        };
+        series.createPriceLine(callPriceLine);
+      });
+    }
+
+    if (puts?.length) {
+      puts.forEach((i: any) => {
+        const putPriceLine = {
+          price: Number(i),
+          color: "#2012be",
+          lineWidth: lineWidth,
+          lineStyle: LineStyle.Solid,
+          axisLabelVisible: true,
+          title: "call strike price",
+        };
+        series.createPriceLine(putPriceLine);
+      });
+    }
+
     drawed = true;
   };
 
-  const addImageTooltip = (series: {
-    setTooltipCallback: (arg0: (tooltipData: any) => HTMLDivElement) => void;
-  }) => {
-    if (!target.current || !currentChart || !chart || drawed) return;
+  const addImageTooltip = (series: any) => {
+    if (!target.current || !currentChart || !chart || drawed || !series) return;
 
-    series.setTooltipCallback(function(tooltipData) {
+    series.setTooltipCallback(function(tooltipData: {
+      time: number;
+      price: number;
+    }) {
       const date = new Date(tooltipData.time * 1000);
       const dateString = date.toLocaleDateString();
       const value = tooltipData.price.toFixed(2);
@@ -147,6 +179,7 @@ const Trend = () => {
     });
 
     setSeries(series);
+    addImageTooltip(series);
 
     chart.subscribeCrosshairMove((param: any) => {
       const x = param?.point?.x || 0;

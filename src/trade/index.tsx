@@ -190,6 +190,7 @@ function Trade() {
   const [strikePrice, setStrikePrice] = useState(0)
   const [inputAmount, setInputAmount] = useState(0)
 
+
     const endT = dayjs.unix(expiry);
     const startT = dayjs();
     const diff = endT.diff(startT); // 时间差
@@ -327,7 +328,6 @@ function Trade() {
         return ethers.BigNumber.from(item).toString()
     })
 
-   // console.log(res, putRes)  
     setInfo({CALL:res, PUT:putRes})
     setExpiry(Number(res[0])* 1000)
    // console.log(dayjs(expiry).format())
@@ -479,6 +479,7 @@ function Trade() {
     setPaid(!paid);
   }
 
+
   useEffect(() => {
     //@ts-ignore
     if (info) {
@@ -522,7 +523,7 @@ function Trade() {
           position="right"
         >
           {/* <Trend data={data} factor={0.8} /> */}
-          <Trend />
+          <Trend strikePrices={info}/>
         </Group>
       </Group>
 
