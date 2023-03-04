@@ -1,154 +1,863 @@
 [
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_price_feed",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "_usdc",
+		  "type": "address"
+		},
+		{
+		  "internalType": "address",
+		  "name": "option_price_oracle",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "nonpayable",
+	  "type": "constructor"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "cdf_data",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "account",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "OptionPurchased",
+	  "type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ethAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "getConversionRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": false,
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "bool",
+		  "name": "expiredITM",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "OptionResolved",
+	  "type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "getPrice",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "previousOwner",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "newOwner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "OwnershipTransferred",
+	  "type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "bool",
-				"name": "is_call",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint256",
-				"name": "strike_price",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "expire_timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "optionPrice",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
+	  "inputs": [],
+	  "name": "LPEquity",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "bool",
-				"name": "is_call",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint256",
-				"name": "expire_timestamp",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "exercise_prob",
-				"type": "uint256"
-			}
-		],
-		"name": "optionStrikePriceWithCertainProb",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
+	  "inputs": [],
+	  "name": "LPShares",
+	  "outputs": [
+		{
+		  "internalType": "contract OptinoLPShares",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "price_feed",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
+	  "inputs": [],
+	  "name": "LPValueOfCalls",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "y",
-				"type": "uint256"
-			}
-		],
-		"name": "sqrt",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "z",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
+	  "inputs": [],
+	  "name": "LPValueOfOptions",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "LPValueOfPuts",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "OptionCollection",
+	  "outputs": [
+		{
+		  "internalType": "contract OptionContract",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "USDC",
+	  "outputs": [
+		{
+		  "internalType": "contract ERC20",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "allExpiredOptionsResolved",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "strike",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "amount",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "buyOption",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "calls",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "one_delta",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "ten_delta",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "twenty_five_delta",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "fifty_delta",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "currentEpoch",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "startTime",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "endTime",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isResolved",
+		  "type": "bool"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "referencePrice",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "endEpoch",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "epochDistributionPerShare",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256[]",
+		  "name": "ids",
+		  "type": "uint256[]"
+		},
+		{
+		  "internalType": "uint256[]",
+		  "name": "amounts",
+		  "type": "uint256[]"
+		}
+	  ],
+	  "name": "exerciseBatch",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "amount",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "exerciseOption",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "expiryIsInEpoch",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "expiryIsResolved",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "delta",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "getDelta",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "strike",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "getPrice",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "strike",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "priceAtExpiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "isITM",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "pure",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "strike",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "isOptionValidInEpoch",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "isSuspended",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "account",
+		  "type": "address"
+		}
+	  ],
+	  "name": "isWithdrawPending",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "liquidityAvailable",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "amount",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "liquidityDeposit",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "strike",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "maxContractsAvailable",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "strike",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "navByStrike",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "optionExpiredITM",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "oracle",
+	  "outputs": [
+		{
+		  "internalType": "contract OptionPrice",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "owner",
+	  "outputs": [
+		{
+		  "internalType": "address",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "poolCollateral",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "puts",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "one_delta",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "ten_delta",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "twenty_five_delta",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "fifty_delta",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "realizedLoss",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "renounceOwnership",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "amount",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "requestLiquidityWithdraw",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "priceAtExpiry",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "resolveExpiredOptions",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "strike",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "expiry",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isCall",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "strikeIsInEpoch",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "totalUSDCPendingWithdraw",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "totalWithdrawRequestedShares",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "newOwner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "transferOwnership",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "withdrawLiquidity",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "name": "withdrawRequested",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "amount",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "epochEndTime",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "isClaimed",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
 	}
-]
+  ]
