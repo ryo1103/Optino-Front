@@ -1,4 +1,4 @@
-import { useMount, useRequest } from "ahooks";
+import { useMount, useRequest, useUnmount } from "ahooks";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import WebSocket from "websocket";
@@ -15,6 +15,7 @@ const useKLine = () => {
 
   const sendMessage = async (limit: any) => {
     if(!ws) return;
+    if (ws.readyState!==1) return 
     // 发送订阅消息
     try{
       ws.send(
@@ -103,6 +104,10 @@ const useKLine = () => {
   }, [data?.length]);
 
   useMount(() => startSocket());
+  useUnmount(()=>{
+    if(!ws) return;
+    ws.close()
+  })
 
   return {data, getSingleData, ws};
 };

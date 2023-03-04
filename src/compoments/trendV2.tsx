@@ -1,4 +1,4 @@
-import { useMount } from "ahooks";
+import { useMount, useUnmount } from "ahooks";
 import BigNumber from "bignumber.js";
 import { createChart, IChartApi, LineStyle } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
@@ -202,6 +202,16 @@ const Trend = ({
     });
   };
 
+  function unloadChart() {
+    if (currentChart) {
+      currentChart.remove();
+      // currentChart = null;
+      chart = null;
+      setCurrentChart(null)
+    }
+  }
+
+  useUnmount(unloadChart)
   useMount(initChart);
 
   return (
