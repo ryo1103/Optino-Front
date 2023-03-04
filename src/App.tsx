@@ -1,20 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Header from './compoments/header';
-import Trade from './trade';
+import { BackgroundImage } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { Route, Routes, useLocation } from "react-router-dom";
 import About from './about';
-import Stake from './stake';
+import './App.css';
+import back1 from './assets/images/back1.png';
+import back4 from './assets/images/back4.png';
+import back5 from './assets/images/back5.png';
+import back6 from './assets/images/back6.png';
+import back9 from './assets/images/back9.png';
 import Result from './result';
-import { BackgroundImage, Center, Text, Box } from '@mantine/core';
-import back1 from  './assets/images/back1.png'
-import back4 from  './assets/images/back4.png'
-import back5 from  './assets/images/back5.png'
-import back6 from  './assets/images/back6.png'
-import back9 from  './assets/images/back9.png'
-import { lazy } from "react";
-import { Route, Routes, useLocation} from "react-router-dom";
-import "./App.css";
+import Stake from './stake';
+import Trade from './trade';
 
 // const Trade = lazy(() => import("./trade"));
 
@@ -40,8 +36,7 @@ function App() {
 
     }
 
-  },[pathname])
-  
+  },[pathname])  
 
   return (
     <>

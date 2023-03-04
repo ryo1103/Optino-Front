@@ -4,34 +4,29 @@ import {
 } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
-import { formatEther } from "@ethersproject/units";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
 import { useWeb3React } from "@web3-react/core";
 import { useCountDown, useRequest } from "ahooks";
+import { ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 import time from "../assets/images/time.png";
 import Header from "../compoments/header";
 import { option, usdt } from "../config";
-import optionAbi from "../config/optino.json"
-import usdtAbi from "../config/USDC.json"
+import optionAbi from "../config/optino.json";
+import usdtAbi from "../config/USDC.json";
 import { injected } from "../connectors";
-import {
-    useOptionContract, useTokenContract
-} from "../hook/useContract";
+import { useOptionContract, useTokenContract } from "../hook/useContract";
 import { simplifyStr } from "../utils";
-import { BigNumber, ethers } from "ethers";
-
 
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Multicall, ContractCallResults,ContractCallContext } from 'ethereum-multicall';
+import { ContractCallContext, Multicall } from "ethereum-multicall";
 import line from "../assets/images/line.png";
 import eth from "../assets/images/eth.png";
 import Trend from "../compoments/trend";
-import useHistoryData from "../hook/useHistoryData";
-import { format } from "path";
+import useKLine from "../hook/useKline";
 
 const maxAllowance =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
@@ -44,6 +39,16 @@ dayjs.extend(duration);
 const useStyles = createStyles((theme) => ({
   back: {
     backgroundImage: `url(../assets/images/back1.png) cover`,
+  },
+  textInputRoot: {
+    width: "80%",
+    borderBottom: "1px solid #000",
+  },
+  textInput: {
+    background: "transparent",
+    fontSize: "1.25rem",
+    lineHeight: 1.55,
+    width: "calc(100% - 38px)",
   },
   pannel: {
     border: "1px solid #07005C",
@@ -68,9 +73,9 @@ const useStyles = createStyles((theme) => ({
     bottom: 0,
   },
   countDownContainer: {
-    position: 'absolute',  
-    right: '60px',
-    top: '0px'
+    position: "absolute",
+    right: "60px",
+    top: "0px",
   },
   countDown: {
     width: "220px",
@@ -212,7 +217,7 @@ function Trade() {
 
   useEffect(() => {
     // console.log('!!!',period)
-   // queryIndexPrice();
+    // queryIndexPrice();
   }, []);
 
   const handleIndex = useCallback(async () => {
@@ -242,8 +247,6 @@ function Trade() {
     }
   }, [indexPrice]);
 
-
-
   const [countdown, formattedRes] = useCountDown({
     targetDate: diff,
   });
@@ -254,7 +257,6 @@ function Trade() {
   const Seconds = seconds < 10 ? "0" + seconds : seconds.toString();
 
   // contract
-
 
   const multiCallOptionInfo = useCallback(async (account: any) => {
     const { ethereum } = window as any;
@@ -269,13 +271,13 @@ function Trade() {
       {
         reference: "optino",
         contractAddress: option,
-        abi: optionAbi ,
+        abi: optionAbi,
         calls: [
           {
             reference: "OptionCollection",
             methodName: "OptionCollection",
             methodParameters: [],
-          }, 
+          },
           {
             reference: "calls",
             methodName: "calls",
@@ -296,7 +298,7 @@ function Trade() {
           {
             reference: "allowance",
             methodName: "allowance",
-            methodParameters: [account,option],
+            methodParameters: [account, option],
           },
           {
             reference: "balanceOf",
@@ -305,8 +307,6 @@ function Trade() {
           },
         ],
       },
-
-
     ];
 
     const multiCallResult = await multicall.call(contractCallContext);
@@ -344,48 +344,46 @@ function Trade() {
   }, []);
 
 
-  const multiOptionPrice = useCallback(async (expiry:any, strike:number,iscall:boolean,) => {
-    const { ethereum } = window as any;
-
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    //const multiCallProvider = new Provider(provider, cid);
-    const multicall = new Multicall({
-      ethersProvider: provider,
-      tryAggregate: true,
-    });
-    const contractCallContext: ContractCallContext[] = [
-      {
-        reference: "optino",
-        contractAddress: option,
-        abi: optionAbi ,
-        calls: [
-          {
-            reference: "price",
-            methodName: "getPrice",
-            methodParameters: [expiry, strike, iscall],
-          }, 
-
-        ],
-      },
-      
-
-
-    ];
-    const multiCallResult = await multicall.call(contractCallContext);
-    
-    let price = multiCallResult.results.optino.callsReturnContext[0].returnValues[0]
-    //formatUnits(ethers.BigNumber.from(multiCallRes[1].returnValues[0]).toString(), 8)
-
-    console.log(ethers.BigNumber.from(price).toString(),price)
-    setOptionPrice(Number(formatUnits(ethers.BigNumber.from(price).toString(),18)))
-
-    console.log(multiCallResult,'price')
-   
-  }, [expiry,strikePrice, select]);
-
   
+  const multiOptionPrice = useCallback(
+    async (expiry: any, strike: number, iscall: boolean) => {
+      const { ethereum } = window as any;
 
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      //const multiCallProvider = new Provider(provider, cid);
+      const multicall = new Multicall({
+        ethersProvider: provider,
+        tryAggregate: true,
+      });
+      const contractCallContext: ContractCallContext[] = [
+        {
+          reference: "optino",
+          contractAddress: option,
+          abi: optionAbi,
+          calls: [
+            {
+              reference: "price",
+              methodName: "getPrice",
+              methodParameters: [expiry, strike, iscall],
+            },
+          ],
+        },
+      ];
+      const multiCallResult = await multicall.call(contractCallContext);
 
+      let price =
+        multiCallResult.results.optino.callsReturnContext[0].returnValues[0];
+      //formatUnits(ethers.BigNumber.from(multiCallRes[1].returnValues[0]).toString(), 8)
+
+      // console.log(formatUnits(ethers.BigNumber.from(price).toString(),18))
+      setOptionPrice(
+        Number(formatUnits(ethers.BigNumber.from(price).toString(), 18))
+      );
+
+      console.log(multiCallResult, "res");
+    },
+    []
+  );
 
   const { run: multiCallOptionInfoRun } = useRequest(
     (account) => multiCallOptionInfo(account),
@@ -394,8 +392,6 @@ function Trade() {
       manual: true,
     }
   );
-
-
 
   useEffect(() => {
     if (account) {
@@ -407,10 +403,9 @@ function Trade() {
     }
   }, [account, multiCallOptionInfoRun]);
 
-  
-
-  const { run: multiOptionPriceRun} = useRequest(
-    (expiry,strikePrice,select) => multiOptionPrice(expiry,strikePrice, select==='CALL'),
+  const { run: multiOptionPriceRun } = useRequest(
+    (expiry, strikePrice, select) =>
+      multiOptionPrice(expiry, strikePrice, select === "CALL"),
     {
       pollingInterval: 5000,
       manual: true,
@@ -418,16 +413,15 @@ function Trade() {
   );
 
   useEffect(() => {
-    if (expiry && select&& strikePrice) {
-        // @ts-igonre
-        multiOptionPriceRun(expiry,strikePrice,select)
+    if (expiry && select && strikePrice) {
+      // @ts-igonre
+      multiOptionPriceRun(expiry, strikePrice, select);
     } else {
       setBalance(0);
 
       //init();
     }
-  }, [account, multiOptionPriceRun,expiry && select && strikePrice]);
-  
+  }, [account, multiOptionPriceRun, expiry && select && strikePrice]);
 
   const { runAsync: approve } = useRequest(
     () => tokenContract?.approve(option, maxAllowance),
@@ -441,8 +435,6 @@ function Trade() {
       },
     }
   );
-
-
 
   const traderBuy = async () => {
     try {
@@ -488,17 +480,16 @@ function Trade() {
     setPaid(!paid);
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     //@ts-ignore
-    if(info){
-        //@ts-ignore
-    setStrikePrice(Number(info[select][info[select].length-3]))
+    if (info) {
+      //@ts-ignore
+      setStrikePrice(Number(info[select][info[select].length - 3]));
     }
-  },[info,select])
+  }, [info, select]);
 
-
-
-  const data = useHistoryData()
+  // const data = useHistoryData()
+  const data = useKLine();
 
   return (
     <Header>
@@ -522,15 +513,22 @@ function Trade() {
           </BackgroundImage>
         </div>
       </Group>
-      
-      <Group position="left" style={{display: 'flex', flexWrap: 'nowrap'}}>
+
+      <Group position="left" style={{ display: "flex", flexWrap: "nowrap" }}>
         {/* <Group style={{ padding: "20px", width: "50%", height: "280px" }} position="right">
         <Trend data={data}/>
         </Group> */}
-        <Group style={{ padding: "20px", minWidth: '867px', width: "100%", height: "60vh" }} position="right">
-            <Trend data={data} factor={0.8}/>
+        <Group
+          style={{
+            padding: "20px",
+            minWidth: "867px",
+            width: "100%",
+            height: "60vh",
+          }}
+          position="right"
+        >
+          <Trend data={data} factor={0.8} />
         </Group>
-        
       </Group>
 
       <Grid
@@ -546,9 +544,7 @@ function Trade() {
               Exercise Date
             </Text>
             <Text c="#07005C" fz={20}>
-                
-             
-            {dayjs(expiry).format("HH:mm:ss") }
+              {dayjs(expiry).format("HH:mm:ss")}
             </Text>
           </Flex>
           <Space h="xl" />
@@ -611,8 +607,7 @@ function Trade() {
               Strike Prices
             </Text>
             <Text c="#07005C" fz={20}>
-                {/** @ts-ignore */}
-              $ {strikePrice}
+              {/** @ts-ignore */}$ {strikePrice}
             </Text>
           </Flex>
           <Space h="xl" />
@@ -670,6 +665,7 @@ function Trade() {
             size="md"
             radius="md"
             onClick={traderBuy}
+            disabled={!inputAmount || !Number(inputAmount)}
           >
             { account === 'undefined' ? 'Connect' :'Confirm'}
           </Button>
