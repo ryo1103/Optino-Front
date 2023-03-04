@@ -23,6 +23,7 @@ const Wrapper = styled.div<{ size: { width: number; height: number } }>`
     height: 100%;
   }
   .tooltip{
+    transition: all linear .1s;
     position: absolute;
     width: 140px;
     height: 136px;
@@ -249,7 +250,6 @@ const Trend: React.FC<TrendProps> = (props: TrendProps) => {
   React.useEffect(() => {
     if (!canvasSize?.width) return;
     drawTrend();
-    // drawTooltip();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initParam, source, type, canvasSize?.width]);
 
