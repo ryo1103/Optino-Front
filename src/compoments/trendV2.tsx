@@ -80,7 +80,7 @@ const Trend = ({ strikePrices }: { strikePrices: StrikePrices }) => {
           lineWidth: lineWidth,
           lineStyle: LineStyle.Solid,
           axisLabelVisible: true,
-          title: "call strike price",
+          title: "put strike price",
         };
         series.createPriceLine(putPriceLine);
       });
