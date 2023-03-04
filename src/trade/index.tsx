@@ -1,4 +1,4 @@
-import { Button, Text, BackgroundImage, Container, Group, Image, SegmentedControl, Grid, Divider, Space, createStyles, Select, Stack, Flex, Paper, Input, TextInput, Slider, Drawer, Title, Modal, Tooltip,Box, List,Mark} from '@mantine/core';
+import { Button, Text, BackgroundImage, Container, Group, Image,NumberInput, SegmentedControl, Grid, Divider, Space, createStyles, Select, Stack, Flex, Paper, Input, TextInput, Slider, Drawer, Title, Modal, Tooltip,Box, List,Mark} from '@mantine/core';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Header from '../compoments/header';
@@ -20,6 +20,7 @@ import duration from 'dayjs/plugin/duration'
 import dayjs from 'dayjs';
 import line from '../assets/images/line.png'
 import rocket from '../assets/images/bull.png'
+import eth from '../assets/images/eth.png'
  
 const maxAllowance = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
 const WETH = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'
@@ -134,6 +135,22 @@ const useStyles = createStyles((theme) => ({
         fontWeight:400,
 
     },
+    input:{
+       
+        color:'#07005C',
+        fontSize:'20px'
+
+    },
+    right:{
+        color:'#07005C',
+        fontSize:'20px',
+        right:'28px'
+
+    },
+    wrapper:{
+
+        borderBottom: '1px solid #07005C '
+    },
     line:{
         '::after':{
             content:`"1"`,
@@ -146,7 +163,8 @@ const useStyles = createStyles((theme) => ({
 
 
         }
-    }
+    },
+    
 
 
 
@@ -173,6 +191,7 @@ function Trade (){
     const Optimistic = useOptionContract(option);
     const [USDCAllowance, setUSDCAllowance] =useState(0)
     const [optionPrice, setOptionPrice] =useState(0.75)
+    const [inputAmount, setInputAmount] = useState(1)
 
     //console.log('!!!', Optimistic)
 
@@ -422,7 +441,7 @@ function Trade (){
                     
                     <Flex direction={'column'}>
                         <Text c='#1300F2' fz={20}>Asset</Text>
-                        <Text c='#07005C' fz={20}>ETH</Text>
+                        <Text c='#07005C' fz={20}> <img src={eth}  height={'20px'} alt='eth logo' style={{marginRight:'5px'}}/>ETH</Text>
                     </Flex>
                    
                   
@@ -449,7 +468,24 @@ function Trade (){
                     <Space h='xl'/>
                     <Flex direction={'column'}>
                         <Text c='#1300F2' fz={20}>Enter Amount</Text>
-                        <Text c='#07005C' fz={20}>2</Text>
+                        
+                        
+                        <NumberInput
+                        w={'85%'}
+                        rightSection={'Calls'}
+                        variant="unstyled"
+                        value={inputAmount}
+                       // precision={6}
+                        //onChange={(e: any) => checkWithdrawAmout(e)}
+                        onChange={(val:any)=>setInputAmount(val)}
+                        min={1}
+                        placeholder="0"
+
+                        classNames={{ input : classes.input, rightSection : classes.right, wrapper: classes.wrapper}}
+                        // @ts-ignore
+                        
+                        />
+                       
                     </Flex>
    
                 </Grid.Col>
@@ -462,7 +498,7 @@ function Trade (){
                     <Space h='xl'/>
                     <Flex direction={'column'}>
                         <Text c='#1300F2' fz={20}>Total Cost</Text>
-                        <Text c='#07005C' fz={20}>$1,647</Text>
+                        <Text c='#07005C' fz={20}>${Number(optionPrice) * Number(inputAmount)}</Text>
                     </Flex>
            
                 </Grid.Col>
