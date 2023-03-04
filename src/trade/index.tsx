@@ -249,8 +249,10 @@ function Trade() {
     }
   }, [indexPrice]);
 
+  console.log('expiry', expiry)
+
   const [countdown, formattedRes] = useCountDown({
-    targetDate: diff,
+    targetDate: dayjs.unix(1677984931),
     // onEnd:()=>{ console.log(1111);navigate("/result/success")}
   });
   const { hours, minutes, seconds } = formattedRes;
