@@ -1,5 +1,6 @@
 import {
-    BackgroundImage, Button, createStyles, Flex, Grid, Group, Space, Text
+    BackgroundImage, Button, createStyles, Flex, Grid, Group, Space, Text,
+    NumberInput
 } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
@@ -27,6 +28,7 @@ import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Multicall, ContractCallResults,ContractCallContext } from 'ethereum-multicall';
 import line from "../assets/images/line.png";
+import eth from "../assets/images/eth.png";
 import Trend from "../compoments/trend";
 import useHistoryData from "../hook/useHistoryData";
 import { format } from "path";
@@ -142,13 +144,21 @@ const useStyles = createStyles((theme) => ({
       color: "transparent",
     },
   },
+  wrapper: {
+    borderBottom:'1px solid #07005C',
+    fontSize:'20px'
+  },
+  rightSection:{
+    right:'20px'
+  },
+  input: {
+
+    fontSize:'20px'
+  },
 }));
 
 const testTime = 1677858179002;
 
-const endT = dayjs.unix(testTime);
-const startT = dayjs();
-const diff = endT.diff(startT); // 时间差
 
 function Trade() {
   const context = useWeb3React();
@@ -174,6 +184,11 @@ function Trade() {
   const [info, setInfo] = useState<any>(null)
   const [expiry, setExpiry] = useState<any>()
   const [strikePrice, setStrikePrice] = useState(0)
+  const [inputAmount, setInputAmount] = useState(0)
+
+    const endT = dayjs.unix(expiry);
+    const startT = dayjs();
+    const diff = endT.diff(startT); // 时间差
 
   //console.log('!!!', Optimistic)
 
@@ -353,7 +368,7 @@ function Trade() {
     let price = multiCallResult.results.optino.callsReturnContext[0].returnValues[0]
     //formatUnits(ethers.BigNumber.from(multiCallRes[1].returnValues[0]).toString(), 8)
 
-   // console.log(formatUnits(ethers.BigNumber.from(price).toString(),18))
+    console.log(formatUnits(ethers.BigNumber.from(price).toString(),18))
     setOptionPrice(Number(formatUnits(ethers.BigNumber.from(price).toString(),18)))
 
 
@@ -537,6 +552,7 @@ function Trade() {
               Asset
             </Text>
             <Text c="#07005C" fz={20}>
+                <img src={eth}  width={14} alt="eth logo" style={{marginRight:'5px'}} />
               ETH
             </Text>
           </Flex>
@@ -599,8 +615,19 @@ function Trade() {
               Enter Amount
             </Text>
             <Text c="#07005C" fz={20}>
-              2
+              
             </Text>
+            <NumberInput
+            variant="unstyled"
+            placeholder="0"
+            classNames={{wrapper : classes.wrapper, rightSection : classes.rightSection,input:classes.input}}
+            value={inputAmount}
+            onChange={(val:any) =>setInputAmount(val)}
+            rightSection={select==='CALL' ? 'Calls' :'Puts'}
+            w='75%'
+            >
+
+            </NumberInput>
           </Flex>
         </Grid.Col>
         <Grid.Col span={2} p="0">
