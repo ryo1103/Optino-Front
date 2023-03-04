@@ -15,6 +15,7 @@ import { injected } from "../connectors";
 import {
     useOptionContract, useTokenContract
 } from "../hook/useContract";
+import { useDisclosure } from '@mantine/hooks';
 
 
 import Header from '../compoments/header';
@@ -30,14 +31,21 @@ const useStyles = createStyles((theme) => ({
         fontSize:'24px',
         fontWeight:400,
 
-
-        
-
     },
     inner:{
         marginRight:'25px'
+    },
+    title:{
+        fontFamily:'TestSöhne-Buch',
+        fontWeight:500,
+        fontSize:'40px'
+
+    },
+    modal:{
+        border: "1px solid rgba(7, 0, 92, 0.16)",
+        backgroundColor: "rgba(21, 250, 38, 0.07)",
+        borderRadius:'12px',
     }
-    
 }))
 
  function Stake  (){
@@ -55,6 +63,7 @@ const useStyles = createStyles((theme) => ({
     const [withdrawAmount, setWithdrawAmount] = useState(10)
     const tokenContract = useTokenContract(usdt);
     const Optimistic = useOptionContract(option);
+    const [opened, { open, close }] = useDisclosure(false);
     const maxAllowance =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
 
@@ -324,7 +333,7 @@ const useStyles = createStyles((theme) => ({
 
 
             <Group align={'start'} position="left" ml={120} mr={120}   mt={100}>
-                <Button radius="md" classNames={{root:classes.root, inner:classes.inner}} size='xl' onClick={deposit}>Stake</Button>
+                <Button radius="md" classNames={{root:classes.root, inner:classes.inner}} size='xl' onClick={open}>Stake</Button>
                 <Button radius="md" classNames={{root:classes.root, inner:classes.inner}} size='xl' ml={60} onClick={withdrawRequest}>Unstake</Button>
 
             {account !== undefined ? (
@@ -340,7 +349,18 @@ const useStyles = createStyles((theme) => ({
                 >Wallet</Button>
             )}
             </Group>
-            
+
+            <Modal
+                opened={opened} 
+                onClose={close} 
+                title="Stake" 
+                centered
+                classNames={{title:classes.title}}
+                >
+
+                {/* Modal content */}
+            </Modal>
+                    
         </Header>
     )
 }

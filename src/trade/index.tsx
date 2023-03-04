@@ -4,6 +4,7 @@ import {
 } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
+import { useNavigate,useLocation} from 'react-router-dom';
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
 import { useWeb3React } from "@web3-react/core";
@@ -190,12 +191,12 @@ function Trade() {
   const [expiry, setExpiry] = useState<any>()
   const [strikePrice, setStrikePrice] = useState(0)
   const [inputAmount, setInputAmount] = useState(0)
+  const navigate = useNavigate();
 
-    const endT = dayjs.unix(expiry);
+    const endT = dayjs.unix(expiry );
     const startT = dayjs();
     const diff = endT.diff(startT); // 时间差
 
-  //console.log('!!!', Optimistic)
 
   const getIndexPrice = () => {
     return fetch(`https://gmx-server-mainnet.uw.r.appspot.com/prices`, {
@@ -249,6 +250,7 @@ function Trade() {
 
   const [countdown, formattedRes] = useCountDown({
     targetDate: diff,
+    // onEnd:()=>{ console.log(1111);navigate("/result/success")}
   });
   const { hours, minutes, seconds } = formattedRes;
 
@@ -330,8 +332,8 @@ function Trade() {
 
    // console.log(res, putRes)  
     setInfo({CALL:res, PUT:putRes})
-    setExpiry(Number(res[0])* 1000)
-   // console.log(dayjs(expiry).format())
+    setExpiry(Number(res[0]))
+    console.log(dayjs(expiry* 1000).format(),dayjs().format())
 
     console.log(multiCallResult,'res')
 
@@ -544,7 +546,7 @@ function Trade() {
               Exercise Date
             </Text>
             <Text c="#07005C" fz={20}>
-              {dayjs(expiry).format("HH:mm:ss")}
+              {dayjs(expiry * 1000).format("HH:mm:ss")}
             </Text>
           </Flex>
           <Space h="xl" />
