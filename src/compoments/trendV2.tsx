@@ -230,7 +230,7 @@ const Trend = ({
       </div>
 
       <div className="current-price" style={{ ...imgPosition, position: "absolute", top: imgPosition?.content_top, color: "rgba(0,0,0,0.4)" }}>
-        Current Price: {BigNumber(imgPosition.currentPrice).toFixed(2)}
+        Price: {BigNumber(imgPosition.currentPrice).toFixed(2)}
       </div>
 
       <img
