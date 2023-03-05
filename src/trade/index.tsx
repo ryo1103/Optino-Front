@@ -772,7 +772,7 @@ function Trade() {
         <Grid.Col span={2} p="0">
         <div style={{height:'25vh'}}>
 
-          <Space h="xl" />
+ 
           <Button
             classNames={{ root: paid ? classes.diable : classes.confirm }}
             size="md"
