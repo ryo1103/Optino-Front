@@ -1,5 +1,4 @@
 import { useMount, useRequest, useUnmount } from "ahooks";
-import dayjs from "dayjs";
 import { useState } from "react";
 import WebSocket from "websocket";
 
@@ -63,7 +62,7 @@ const useKLineOkex = () => {
       if (!data?.data?.length) return;
       //   {time: { year: 2018 ,month: 12 ,day: 30 }, value: 29.567577074788517}
       const trullyData = data.data.map((i: any) => {
-        const curDate = +dayjs(i[0])
+        const curDate = +i[0]
         // .format('YYYY-MM-DD-HH-MM-SS');
         return {
         //   t: i[0],
@@ -78,12 +77,11 @@ const useKLineOkex = () => {
         //     // second: curDate.second(),
         //   },
         };
-      }).sort((a: { t: number; },b: { t: number; })=> b?.t - a?.t);
+      }).sort((a: { t: number; },b: { t: number; })=> b?.t - a?.t > 0);
       if (!trullyData?.length) return;
 
       setData((old: any) => {
         const _old = JSON.parse(JSON.stringify(old));
-
         if(_old.slice(-1)[0]?.time >= trullyData[0]?.time) return _old;
 
 
