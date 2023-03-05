@@ -39,7 +39,8 @@ import line from "../assets/images/line.png";
 import BigNumber from "bignumber.js";
 import { Options } from "../App";
 import Trend from "../compoments/trendV2";
-import useKLine from "../hook/useKline";
+// import useKLine from "../hook/useKline";
+import useKLine from "../hook/useKline-okex";
 import useMyPosition from "../hook/useMyPosition";
 
 const onlyMax = true;
