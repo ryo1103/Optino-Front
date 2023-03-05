@@ -103,6 +103,7 @@ const useStyles = createStyles((theme) => ({
     color: "rgba(246, 245, 255, 1)",
 
     verticalAlign: "center",
+    fontFamily:'TestSöhne-Fett',
 
     lineHeight: "60px",
     paddingLeft: "20px",
