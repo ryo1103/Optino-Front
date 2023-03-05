@@ -30,6 +30,8 @@ import { checkExpires, simplifyStr } from "../utils";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { ContractCallContext, Multicall } from "ethereum-multicall";
 import eth from "../assets/images/eth.png";
 import line from "../assets/images/line.png";
@@ -48,7 +50,8 @@ const WETH = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1";
 const USD_DECIMALS = 30;
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
-// dayjs.extend(utc);
+dayjs.extend(timezone)
+dayjs.extend(utc);
 
 const useStyles = createStyles((theme) => ({
   back: {
@@ -355,7 +358,7 @@ function Trade() {
       multiCallResult.results.usdc.callsReturnContext[0].returnValues[0];
     let usdcBalance =
       multiCallResult.results.usdc.callsReturnContext[1].returnValues[0];
-
+    
     const allLevelsCallList = multiCallResult.results.optino.callsReturnContext
       .slice(1, 1 + 3)
       ?.map((i) => i?.returnValues);
@@ -373,7 +376,7 @@ function Trade() {
       callList = checkExpires(allLevelsCallList) || [];
       putList = checkExpires(allLevelsPutList) || [];
     }
-
+   
     optionProvider.setOptions({
       CALL: allLevelsCallList,
       PUT: allLevelsPutList,
@@ -395,6 +398,8 @@ function Trade() {
 
     setInfo({ CALL: res, PUT: putRes });
     setExpiry(Number(res[0]));
+
+     console.log(dayjs(Number(res[0])).tz("America/New_York"),999)
 
     setUSDCAllowance(
       Number(formatUnits(ethers.BigNumber.from(usdcAllowence).toString(), 18))
@@ -629,14 +634,16 @@ function Trade() {
         justify="center"
       >
         <Grid.Col span={2} p="0">
+            <div style={{height:'25vh'}}>
           <Flex direction={"column"}>
             <Text c="#1300F2" fz={20}>
               Exercise Date
             </Text>
             <Text c="#07005C" fz={20}>
-              {dayjs(expiry * 1000).format("HH:mm:ss")}
+              {dayjs(expiry * 1000).tz("America/New_York").format("HH:mm:ss")}
             </Text>
           </Flex>
+          <Space h="xl" />
           <Space h="xl" />
 
           <Flex direction={"column"}>
@@ -653,8 +660,10 @@ function Trade() {
               ETH
             </Text>
           </Flex>
+          </div>
         </Grid.Col>
         <Grid.Col span={2} p="0">
+        <div style={{height:'25vh'}}>
           <Flex direction={"column"}>
             <Text c="#1300F2" fz={20}>
               Strategy
@@ -703,8 +712,10 @@ function Trade() {
               trans
             </Text>
           </Flex>
+          </div>
         </Grid.Col>
         <Grid.Col span={2} p="0">
+        <div style={{height:'25vh'}}>
           <Flex direction={"column"}>
             <Text c="#1300F2" fz={20}>
               Strike Prices
@@ -713,6 +724,7 @@ function Trade() {
               {/** @ts-ignore */}$ {strikePrice}
             </Text>
           </Flex>
+          <Space h="xl" />
           <Space h="xl" />
           <Flex direction={"column"}>
             <Text c="#1300F2" fz={20}>
@@ -733,8 +745,10 @@ function Trade() {
               w="75%"
             ></NumberInput>
           </Flex>
+          </div>
         </Grid.Col>
         <Grid.Col span={2} p="0">
+        <div style={{height:'25vh'}}>
           <Flex direction={"column"}>
             <Text c="#1300F2" fz={20}>
               Option Price
@@ -744,6 +758,7 @@ function Trade() {
             </Text>
           </Flex>
           <Space h="xl" />
+          <Space h="xl" />
           <Flex direction={"column"}>
             <Text c="#1300F2" fz={20}>
               Total Cost
@@ -752,16 +767,11 @@ function Trade() {
               ${inputAmount * optionPrice}
             </Text>
           </Flex>
+          </div>
         </Grid.Col>
         <Grid.Col span={2} p="0">
-          <Flex direction={"column"} style={{ color: "transparent" }}>
-            <Text c="transparent" fz={20}>
-              trans
-            </Text>
-            <Text c="transparent" fz={20}>
-              trans
-            </Text>
-          </Flex>
+        <div style={{height:'25vh'}}>
+
           <Space h="xl" />
           <Button
             classNames={{ root: paid ? classes.diable : classes.confirm }}
@@ -774,16 +784,21 @@ function Trade() {
             {!account ? "Connect" : !USDCAllowance ? "Approve" : "Confirm"}
           </Button>
           <Space h="xl" />
+          <Space h="xl" />
+          <Space h="xl" />
+          
           <Button
             classNames={{ root: paid ? classes.diable : classes.confirm }}
             size="md"
             radius="md"
+           
             // loading={exerciseLoading}
             onClick={handleExercise}
             disabled={!indexPrice || !account}
           >
             Exercise
           </Button>
+          </div>
         </Grid.Col>
 
         <Grid.Col
@@ -795,21 +810,22 @@ function Trade() {
               : "1px solid #07005C",
           }}
         >
-          <Flex
-            direction={"column"}
-            gap="xl"
-            justify="center"
-            align="center"
-            h="35vh"
-          >
-            <Flex direction={"column"}>
-              <Text c="#1300F2" fz={20}>
+        <Group p='0'>
+          <div style={{height:'35vh',width:0,
+        }}></div>
+
+        <div style={{height:'24vh',margin:'0 auto'}}>
+        <Flex direction={"column"}>
+             <Text c="#1300F2" fz={20} >
                 Balance
               </Text>
               <Text c="#07005C" fz={20}>
                 ${balance}
               </Text>
-            </Flex>
+          </Flex>
+          <Space h="xl" />
+          <Space h="xl" />
+          <Flex direction={"column"}>
             {account !== undefined ? (
               // @ts-ignore
 
@@ -838,6 +854,8 @@ function Trade() {
               <Text style={{ display: "block" }}>{simplifyStr(account)}</Text>
             ) : null}
           </Flex>
+          </div>
+          </Group>
         </Grid.Col>
       </Grid>
     </Header>
