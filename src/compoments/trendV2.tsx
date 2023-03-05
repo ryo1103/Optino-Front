@@ -41,6 +41,8 @@ const Trend = ({
     top: "0px",
     left: "0px",
     opacity: 0,
+    currentPrice: "0",
+    content_top: "-50px"
   });
 
   useEffect(() => {
@@ -198,6 +200,8 @@ const Trend = ({
         left: x - 70 + "px",
         top: y - 70 + "px",
         opacity: 1,
+        currentPrice: price,
+        content_top: y - 90 + "px",
       });
     });
   };
@@ -224,6 +228,11 @@ const Trend = ({
       <div className="current-price" style={{ color: "rgba(0,0,0,0.4)" }}>
         Index Price: {BigNumber(data?.slice(-1)[0]?.value).toFixed(2)}
       </div>
+
+      <div className="current-price" style={{ ...imgPosition, position: "absolute", top: imgPosition?.content_top, color: "rgba(0,0,0,0.4)" }}>
+        Current Price: {BigNumber(imgPosition.currentPrice).toFixed(2)}
+      </div>
+
       <img
         style={{ ...imgPosition, position: "absolute" }}
         className="tooltip"
