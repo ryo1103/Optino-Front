@@ -79,12 +79,12 @@ const useMyPosition = () => {
           {
             reference: "balanceOf",
             methodName: "balanceOf",
-            methodParameters: [account, ids["CALL_24h_2"]],
+            methodParameters: [account, ids["CALL_24h_3"]],
           },
           {
             reference: "balanceOf",
             methodName: "balanceOf",
-            methodParameters: [account, ids["PUT_24h_2"]],
+            methodParameters: [account, ids["PUT_24h_3"]],
           },
         ],
       },

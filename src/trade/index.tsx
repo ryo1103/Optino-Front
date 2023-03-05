@@ -396,6 +396,8 @@ function Trade() {
       return ethers.BigNumber.from(item).toString();
     });
 
+    console.log(res, putRes)
+
     setInfo({ CALL: res, PUT: putRes });
     setExpiry(Number(res[0]));
 
@@ -557,7 +559,7 @@ function Trade() {
   useEffect(() => {
     if (curSelectedInfo) {
       //@ts-ignore
-      setStrikePrice(Number(curSelectedInfo[curSelectedInfo.length - 2]));
+      setStrikePrice(Number(curSelectedInfo[curSelectedInfo.length - 1]));
     }
   }, [curSelectedInfo]);
 
